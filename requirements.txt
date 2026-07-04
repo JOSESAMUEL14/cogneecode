@@ -1,0 +1,4 @@
+cognee
+flask
+python-dotenv
+fastembed

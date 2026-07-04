@@ -1,0 +1,950 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard — CogneeCode</title>
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+    
+    <style>
+        /* ===== RESET & BASE ===== */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #060612;
+            color: #ffffff;
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+        a { text-decoration: none; color: inherit; }
+        
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #030309; }
+        ::-webkit-scrollbar-thumb { background: linear-gradient(135deg, #10b981, #3b82f6); border-radius: 10px; }
+
+        /* ===== SIDEBAR ===== */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 200px;
+            height: 100vh;
+            background: rgba(8, 8, 18, 0.98);
+            border-right: 1px solid rgba(255,255,255,0.05);
+            padding: 24px 16px 20px;
+            display: flex;
+            flex-direction: column;
+            z-index: 100;
+            backdrop-filter: blur(20px);
+            overflow-y: auto;
+        }
+
+        .sb-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 28px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+        }
+        .sb-logo-icon {
+            width: 30px;
+            height: 30px;
+            border-radius: 10px;
+            background: #0a0a1a;
+            border: 1px solid rgba(255,255,255,0.05);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            flex-shrink: 0;
+        }
+        .sb-logo-icon::before {
+            content: '';
+            position: absolute;
+            width: 18px;
+            height: 18px;
+            border: 1px dashed rgba(52,211,153,0.4);
+            border-radius: 50%;
+            animation: spin 8s linear infinite;
+        }
+        .sb-logo-icon::after {
+            content: '';
+            position: absolute;
+            width: 7px;
+            height: 7px;
+            background: #34d399;
+            border-radius: 50%;
+            box-shadow: 0 0 8px #10b981;
+            animation: pulse-glow 2s ease-in-out infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes pulse-glow {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.6; transform: scale(1.3); }
+        }
+
+        .sb-logo-text {
+            font-size: 17px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #6ee7b7, #60a5fa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1.2;
+        }
+        .sb-logo-sub {
+            font-size: 8px;
+            color: rgba(255,255,255,0.2);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .sb-section {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: rgba(255,255,255,0.15);
+            margin: 16px 0 8px 4px;
+            font-weight: 600;
+        }
+
+        .sb-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 12px;
+            border-radius: 8px;
+            color: rgba(255,255,255,0.4);
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.2s;
+            margin-bottom: 2px;
+            position: relative;
+        }
+        .sb-item i { font-size: 16px; width: 20px; }
+        .sb-item:hover {
+            color: #ffffff;
+            background: rgba(255,255,255,0.04);
+        }
+        .sb-item.active {
+            color: #34d399;
+            background: rgba(16,185,129,0.08);
+        }
+        .sb-item.active::before {
+            content: '';
+            position: absolute;
+            left: -16px;
+            width: 3px;
+            height: 24px;
+            background: linear-gradient(180deg, #10b981, #3b82f6);
+            border-radius: 0 4px 4px 0;
+        }
+
+        .sb-badge {
+            background: linear-gradient(135deg, #10b981, #3b82f6);
+            color: #fff;
+            font-size: 8px;
+            padding: 1px 8px;
+            border-radius: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-left: auto;
+        }
+
+        .sb-footer {
+            margin-top: auto;
+            padding-top: 16px;
+            border-top: 1px solid rgba(255,255,255,0.04);
+        }
+        .sb-footer-label {
+            font-size: 10px;
+            color: rgba(255,255,255,0.2);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .sb-footer-val {
+            font-size: 15px;
+            font-weight: 700;
+            color: #34d399;
+            margin: 2px 0 6px;
+        }
+        .sb-mem-bar {
+            width: 100%;
+            height: 4px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .sb-mem-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #10b981, #3b82f6);
+            border-radius: 4px;
+            transition: width 0.5s;
+            width: 0%;
+        }
+
+        /* ===== MAIN CONTENT ===== */
+        .main {
+            margin-left: 200px;
+            padding: 24px 32px 40px;
+            min-height: 100vh;
+        }
+
+        /* ===== TOPBAR ===== */
+        .topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+        }
+        .topbar-left h1 {
+            font-size: 24px;
+            font-weight: 700;
+        }
+        .topbar-left p {
+            font-size: 14px;
+            color: rgba(255,255,255,0.3);
+            margin-top: 2px;
+        }
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        /* ===== BACK BUTTON ===== */
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.06);
+            color: rgba(255,255,255,0.5);
+            padding: 6px 14px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-bottom: 12px;
+            font-family: inherit;
+            text-decoration: none;
+        }
+        .back-btn:hover {
+            background: rgba(255,255,255,0.08);
+            color: #ffffff;
+        }
+        .back-btn i {
+            font-size: 16px;
+        }
+
+        .live-chip {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            color: rgba(255,255,255,0.3);
+            background: rgba(255,255,255,0.03);
+            padding: 6px 14px;
+            border-radius: 20px;
+            border: 1px solid rgba(255,255,255,0.04);
+        }
+        .live-chip .dot {
+            width: 6px;
+            height: 6px;
+            background: #10b981;
+            border-radius: 50%;
+            animation: pulse-glow 1.5s ease-in-out infinite;
+        }
+        .topbar-btn {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.06);
+            color: rgba(255,255,255,0.6);
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .topbar-btn:hover {
+            background: rgba(255,255,255,0.08);
+            color: #ffffff;
+        }
+        .topbar-btn.primary {
+            background: linear-gradient(135deg, #10b981, #3b82f6);
+            border: none;
+            color: #fff;
+        }
+        .topbar-btn.primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(16,185,129,0.25);
+        }
+
+        /* ===== WELCOME BANNER ===== */
+        .welcome-banner {
+            background: linear-gradient(135deg, rgba(16,185,129,0.08), rgba(59,130,246,0.08));
+            border: 1px solid rgba(16,185,129,0.1);
+            border-radius: 16px;
+            padding: 28px 32px;
+            margin-bottom: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+        .welcome-banner h2 {
+            font-size: 20px;
+            font-weight: 600;
+        }
+        .welcome-banner p {
+            color: rgba(255,255,255,0.4);
+            font-size: 14px;
+        }
+        .welcome-actions {
+            display: flex;
+            gap: 10px;
+        }
+        .welcome-btn {
+            padding: 8px 18px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+        }
+        .welcome-btn.green {
+            background: rgba(16,185,129,0.12);
+            color: #34d399;
+        }
+        .welcome-btn.green:hover {
+            background: rgba(16,185,129,0.2);
+        }
+        .welcome-btn.blue {
+            background: rgba(59,130,246,0.12);
+            color: #60a5fa;
+        }
+        .welcome-btn.blue:hover {
+            background: rgba(59,130,246,0.2);
+        }
+
+        /* ===== STATS GRID ===== */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 28px;
+        }
+        .stat-box {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.04);
+            border-radius: 12px;
+            padding: 18px 20px;
+            transition: all 0.3s;
+        }
+        .stat-box:hover {
+            border-color: rgba(16,185,129,0.1);
+            transform: translateY(-2px);
+        }
+        .stat-box .num {
+            font-size: 28px;
+            font-weight: 700;
+        }
+        .stat-box .num.green { color: #34d399; }
+        .stat-box .num.blue { color: #60a5fa; }
+        .stat-box .num.purple { color: #a78bfa; }
+        .stat-box .num.amber { color: #fbbf24; }
+        .stat-box .label {
+            font-size: 12px;
+            color: rgba(255,255,255,0.25);
+            margin-top: 2px;
+        }
+
+        /* ===== TWO COLUMN LAYOUT ===== */
+        .two-col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-bottom: 28px;
+        }
+
+        /* ===== PANELS ===== */
+        .panel {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.04);
+            border-radius: 16px;
+            padding: 24px;
+        }
+        .panel h3 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .panel h3 i {
+            color: rgba(255,255,255,0.2);
+        }
+
+        /* ===== QUICK REMEMBER ===== */
+        .quick-remember select {
+            width: 100%;
+            padding: 10px 14px;
+            border-radius: 8px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.06);
+            color: #fff;
+            font-size: 13px;
+            margin-bottom: 10px;
+            font-family: inherit;
+            outline: none;
+        }
+        .quick-remember select option {
+            background: #060612;
+        }
+        .quick-remember textarea {
+            width: 100%;
+            padding: 12px 14px;
+            border-radius: 8px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.06);
+            color: #fff;
+            font-size: 13px;
+            resize: vertical;
+            min-height: 80px;
+            font-family: inherit;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .quick-remember textarea:focus {
+            border-color: rgba(16,185,129,0.3);
+        }
+        .quick-remember textarea::placeholder {
+            color: rgba(255,255,255,0.2);
+        }
+        .quick-remember button {
+            margin-top: 10px;
+            width: 100%;
+            padding: 10px;
+            border-radius: 8px;
+            border: none;
+            background: linear-gradient(135deg, #10b981, #3b82f6);
+            color: #fff;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .quick-remember button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(16,185,129,0.25);
+        }
+
+        /* ===== RECENT MEMORIES ===== */
+        .recent-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.03);
+        }
+        .recent-item:last-child {
+            border-bottom: none;
+        }
+        .recent-badge {
+            font-size: 9px;
+            padding: 2px 10px;
+            border-radius: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            flex-shrink: 0;
+        }
+        .recent-badge.decision { background: rgba(124,58,237,0.12); color: #a78bfa; }
+        .recent-badge.bug { background: rgba(239,68,68,0.12); color: #f87171; }
+        .recent-badge.snippet { background: rgba(59,130,246,0.12); color: #60a5fa; }
+        .recent-badge.general { background: rgba(52,211,153,0.12); color: #34d399; }
+        .recent-text {
+            font-size: 13px;
+            color: rgba(255,255,255,0.6);
+            flex: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .recent-date {
+            font-size: 11px;
+            color: rgba(255,255,255,0.15);
+            flex-shrink: 0;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 30px 0;
+            color: rgba(255,255,255,0.15);
+        }
+        .empty-state i {
+            font-size: 36px;
+            display: block;
+            margin-bottom: 10px;
+            opacity: 0.3;
+        }
+        .empty-state p {
+            font-size: 13px;
+        }
+
+        /* ===== QUICK ASK ===== */
+        .quick-ask {
+            display: flex;
+            gap: 12px;
+        }
+        .quick-ask input {
+            flex: 1;
+            padding: 12px 16px;
+            border-radius: 10px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.06);
+            color: #fff;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s;
+            font-family: inherit;
+        }
+        .quick-ask input:focus {
+            border-color: rgba(16,185,129,0.3);
+        }
+        .quick-ask input::placeholder {
+            color: rgba(255,255,255,0.2);
+        }
+        .quick-ask button {
+            padding: 12px 28px;
+            border-radius: 10px;
+            border: none;
+            background: linear-gradient(135deg, #10b981, #3b82f6);
+            color: #fff;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .quick-ask button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(16,185,129,0.25);
+        }
+
+        .ask-response {
+            margin-top: 14px;
+            padding: 16px;
+            background: rgba(255,255,255,0.03);
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.04);
+            display: none;
+            font-size: 14px;
+            color: rgba(255,255,255,0.6);
+            line-height: 1.7;
+        }
+        .ask-response.show {
+            display: block;
+        }
+        .ask-response .typing-cursor {
+            display: inline-block;
+            width: 2px;
+            height: 16px;
+            background: #34d399;
+            animation: blink 1s step-end infinite;
+            vertical-align: text-bottom;
+            margin-left: 2px;
+        }
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+
+        /* ===== TOAST ===== */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            padding: 16px 24px;
+            border-radius: 12px;
+            background: rgba(16,185,129,0.95);
+            color: #fff;
+            font-size: 14px;
+            font-weight: 500;
+            box-shadow: 0 12px 40px rgba(0,0,0,0.5);
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.4s;
+            z-index: 999;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        .toast.error {
+            background: rgba(239,68,68,0.95);
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 992px) {
+            .two-col { grid-template-columns: 1fr; }
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (max-width: 768px) {
+            .sidebar { width: 60px; padding: 16px 8px; }
+            .sidebar .sb-logo-text, .sidebar .sb-logo-sub, 
+            .sidebar .sb-section, .sidebar .sb-item span,
+            .sidebar .sb-badge, .sidebar .sb-footer-label,
+            .sidebar .sb-footer-val { display: none; }
+            .sidebar .sb-item { justify-content: center; padding: 10px; }
+            .sidebar .sb-item i { font-size: 20px; width: auto; }
+            .sidebar .sb-item.active::before { left: -8px; }
+            .main { margin-left: 60px; padding: 16px; }
+            .topbar { flex-direction: column; align-items: flex-start; gap: 12px; }
+            .welcome-banner { flex-direction: column; align-items: flex-start; }
+            .stats-grid { grid-template-columns: 1fr 1fr; }
+            .quick-ask { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ===== SIDEBAR ===== -->
+    <div class="sidebar">
+        <div class="sb-logo">
+            <div class="sb-logo-icon"></div>
+            <div>
+                <div class="sb-logo-text">CogneeCode</div>
+                <div class="sb-logo-sub">Developer Memory</div>
+            </div>
+        </div>
+
+        <div class="sb-section">Main</div>
+        <a href="/dashboard" class="sb-item active">
+            <i class="ti ti-layout-dashboard"></i> <span>Dashboard</span>
+        </a>
+        <a href="/ask" class="sb-item">
+            <i class="ti ti-message-circle"></i> <span>Ask Codebase</span>
+            <span class="sb-badge">AI</span>
+        </a>
+        <a href="/search" class="sb-item">
+            <i class="ti ti-search"></i> <span>Search Memory</span>
+        </a>
+
+        <div class="sb-section">Remember</div>
+        <a href="/decisions" class="sb-item">
+            <i class="ti ti-bulb"></i> <span>Decisions</span>
+        </a>
+        <a href="/bugs" class="sb-item">
+            <i class="ti ti-bug"></i> <span>Bug Fixes</span>
+        </a>
+
+        <div class="sb-section">Visualize</div>
+        <a href="/graph-view" class="sb-item">
+            <i class="ti ti-clock"></i> <span>Timeline</span>
+        </a>
+        <a href="/analytics" class="sb-item">
+            <i class="ti ti-chart-bar"></i> <span>Analytics</span>
+        </a>
+
+        <div class="sb-section">Manage</div>
+        <a href="/forget" class="sb-item">
+            <i class="ti ti-trash"></i> <span>Forget</span>
+        </a>
+
+        <div class="sb-footer">
+            <div class="sb-footer-label">Memories stored</div>
+            <div class="sb-footer-val" id="memCount">Loading...</div>
+            <div class="sb-mem-bar">
+                <div class="sb-mem-fill" id="memBar"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <div class="main">
+
+        <!-- ===== BACK BUTTON ===== -->
+        <a href="/" class="back-btn">
+            <i class="ti ti-arrow-left"></i> Back to Landing
+        </a>
+
+        <!-- ===== TOPBAR ===== -->
+        <div class="topbar">
+            <div class="topbar-left">
+                <h1>Dashboard</h1>
+                <p>Your developer memory hub</p>
+            </div>
+            <div class="topbar-right">
+                <div class="live-chip">
+                    <span class="dot"></span> Memory live
+                </div>
+                <a href="/decisions" class="topbar-btn primary">+ Remember something</a>
+                <a href="/ask" class="topbar-btn">Ask codebase</a>
+            </div>
+        </div>
+
+        <!-- ===== WELCOME BANNER ===== -->
+        <div class="welcome-banner">
+            <div>
+                <h2>💡 What do you want to remember today?</h2>
+                <p>Log decisions, bugs, or any context — CogneeCode remembers it all</p>
+            </div>
+            <div class="welcome-actions">
+                <a href="/decisions" class="welcome-btn green">💡 Log a decision</a>
+                <a href="/bugs" class="welcome-btn blue">🐛 Log a bug fix</a>
+            </div>
+        </div>
+
+        <!-- ===== STATS GRID ===== -->
+        <div class="stats-grid">
+            <div class="stat-box">
+                <div class="num green" id="statMem">0</div>
+                <div class="label">Total Memories</div>
+            </div>
+            <div class="stat-box">
+                <div class="num purple" id="statDecisions">0</div>
+                <div class="label">Decisions Logged</div>
+            </div>
+            <div class="stat-box">
+                <div class="num blue" id="statBugs">0</div>
+                <div class="label">Bug Fixes Saved</div>
+            </div>
+            <div class="stat-box">
+                <div class="num amber" id="statDays">1</div>
+                <div class="label">Days Active</div>
+            </div>
+        </div>
+
+        <!-- ===== TWO COLUMN ===== -->
+        <div class="two-col">
+
+            <!-- ===== QUICK REMEMBER ===== -->
+            <div class="panel quick-remember">
+                <h3><i class="ti ti-pencil-plus"></i> Quick Remember</h3>
+                <select id="memType">
+                    <option value="decision">Decision</option>
+                    <option value="bug">Bug Fix</option>
+                    <option value="context">Code Context</option>
+                    <option value="snippet">Snippet</option>
+                    <option value="general">General</option>
+                </select>
+                <textarea id="memText" placeholder="What do you want CogneeCode to remember?"></textarea>
+                <button onclick="rememberQuick()">Remember this</button>
+            </div>
+
+            <!-- ===== RECENT MEMORIES ===== -->
+            <div class="panel">
+                <h3><i class="ti ti-clock"></i> Recent Memories</h3>
+                <div id="recentList">
+                    <div class="empty-state">
+                        <i class="ti ti-inbox"></i>
+                        <p>No memories yet. Start by remembering something!</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- ===== QUICK ASK ===== -->
+        <div class="panel" style="margin-top: 0;">
+            <h3><i class="ti ti-message-circle"></i> Quick Ask</h3>
+            <div class="quick-ask">
+                <input id="quickQuestion" placeholder="Ask anything about your codebase..." />
+                <button onclick="quickAsk()">Ask</button>
+            </div>
+            <div class="ask-response" id="quickResponse"></div>
+        </div>
+
+    </div>
+
+    <!-- ===== TOAST ===== -->
+    <div class="toast" id="toast"></div>
+
+    <!-- ===== SCRIPTS ===== -->
+    <script>
+        // ===== SIDEBAR STATS =====
+        async function loadSidebarStats() {
+            try {
+                const res = await fetch('/api/stats');
+                const data = await res.json();
+                const el = document.getElementById('memCount');
+                const bar = document.getElementById('memBar');
+                if (el) el.textContent = (data.memories || 0) + ' memories';
+                if (bar) bar.style.width = Math.min((data.memories || 0), 100) + '%';
+            } catch(e) {
+                const el = document.getElementById('memCount');
+                if (el) el.textContent = '0 memories';
+            }
+        }
+        loadSidebarStats();
+
+        // ===== LOAD STATS =====
+        async function loadStats() {
+            try {
+                const res = await fetch('/api/stats');
+                const data = await res.json();
+                document.getElementById('statMem').textContent = data.memories || 0;
+                document.getElementById('statDecisions').textContent = data.decisions || 0;
+                document.getElementById('statBugs').textContent = data.bugs || 0;
+                document.getElementById('statDays').textContent = data.days || 1;
+            } catch(e) {
+                const decisions = JSON.parse(localStorage.getItem('cc_decisions') || '[]');
+                const bugs = JSON.parse(localStorage.getItem('cc_bugs') || '[]');
+                document.getElementById('statDecisions').textContent = decisions.length;
+                document.getElementById('statBugs').textContent = bugs.length;
+                document.getElementById('statMem').textContent = decisions.length + bugs.length;
+                document.getElementById('statDays').textContent = 1;
+            }
+        }
+        loadStats();
+
+        // ===== LOAD RECENT MEMORIES =====
+        function loadRecentMemories() {
+            const container = document.getElementById('recentList');
+            const all = [];
+            
+            const decisions = JSON.parse(localStorage.getItem('cc_decisions') || '[]');
+            decisions.forEach(d => all.push({ type: 'decision', text: d.title, date: d.date, id: d.id }));
+            
+            const bugs = JSON.parse(localStorage.getItem('cc_bugs') || '[]');
+            bugs.forEach(b => all.push({ type: 'bug', text: b.description, date: b.date, id: b.id }));
+            
+            all.sort((a, b) => new Date(b.date) - new Date(a.date));
+            
+            if (all.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="ti ti-inbox"></i>
+                        <p>No memories yet. Start by remembering something!</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = all.slice(0, 5).map(item => `
+                <div class="recent-item">
+                    <span class="recent-badge ${item.type}">${item.type}</span>
+                    <span class="recent-text">${item.text.substring(0, 60)}${item.text.length > 60 ? '...' : ''}</span>
+                    <span class="recent-date">${new Date(item.date).toLocaleDateString()}</span>
+                </div>
+            `).join('');
+        }
+        loadRecentMemories();
+
+        // ===== TOAST =====
+        function showToast(message, isError = false) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = 'toast' + (isError ? ' error' : '');
+            setTimeout(() => toast.classList.add('show'), 10);
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+
+        // ===== QUICK REMEMBER =====
+        async function rememberQuick() {
+            const type = document.getElementById('memType').value;
+            const text = document.getElementById('memText').value.trim();
+            
+            if (!text) {
+                showToast('⚠️ Please enter something to remember', true);
+                return;
+            }
+            
+            try {
+                const res = await fetch('/api/remember', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ text, type, dataset: 'cogneecode' })
+                });
+                
+                const data = await res.json();
+                
+                if (data.status === 'success') {
+                    showToast('✅ Remembered! Added to your knowledge graph.');
+                    document.getElementById('memText').value = '';
+                    
+                    if (type === 'decision') {
+                        const decisions = JSON.parse(localStorage.getItem('cc_decisions') || '[]');
+                        decisions.push({ id: Date.now(), title: text, context: text, tags: '', date: new Date().toISOString() });
+                        localStorage.setItem('cc_decisions', JSON.stringify(decisions));
+                    } else if (type === 'bug') {
+                        const bugs = JSON.parse(localStorage.getItem('cc_bugs') || '[]');
+                        bugs.push({ id: Date.now(), description: text, error: '', solution: '', language: 'General', date: new Date().toISOString() });
+                        localStorage.setItem('cc_bugs', JSON.stringify(bugs));
+                    }
+                    
+                    loadRecentMemories();
+                    loadStats();
+                    loadSidebarStats();
+                } else {
+                    showToast('❌ Error: ' + data.message, true);
+                }
+            } catch(e) {
+                showToast('❌ Error saving memory', true);
+            }
+        }
+
+        // ===== QUICK ASK =====
+        async function quickAsk() {
+            const input = document.getElementById('quickQuestion');
+            const response = document.getElementById('quickResponse');
+            const question = input.value.trim();
+            
+            if (!question) {
+                showToast('⚠️ Please enter a question', true);
+                return;
+            }
+            
+            response.className = 'ask-response show';
+            response.innerHTML = 'Thinking<span class="typing-cursor"></span>';
+            
+            try {
+                const res = await fetch('/api/ask', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ question, language: 'English' })
+                });
+                
+                const data = await res.json();
+                
+                if (data.status === 'success') {
+                    const answer = data.answer || 'No answer found.';
+                    response.innerHTML = '';
+                    let i = 0;
+                    function typeChar() {
+                        if (i < answer.length) {
+                            response.textContent += answer.charAt(i);
+                            i++;
+                            setTimeout(typeChar, 10);
+                        }
+                    }
+                    typeChar();
+                } else {
+                    response.textContent = '❌ Error: ' + data.message;
+                }
+            } catch(e) {
+                response.textContent = '❌ Error: Could not get response';
+            }
+        }
+
+        document.getElementById('quickQuestion').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') quickAsk();
+        });
+        document.getElementById('memText').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter' && e.shiftKey) {
+                e.preventDefault();
+                rememberQuick();
+            }
+        });
+    </script>
+
+</body>
+</html>

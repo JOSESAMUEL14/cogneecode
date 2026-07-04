@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Forget — CogneeCode</title>
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+    
+    <style>
+        /* ===== RESET & BASE ===== */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #060612;
+            color: #ffffff;
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+        a { text-decoration: none; color: inherit; }
+        
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #030309; }
+        ::-webkit-scrollbar-thumb { background: linear-gradient(135deg, #10b981, #3b82f6); border-radius: 10px; }
+
+        /* ===== SIDEBAR ===== */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 200px;
+            height: 100vh;
+            background: rgba(8, 8, 18, 0.98);
+            border-right: 1px solid rgba(255,255,255,0.05);
+            padding: 24px 16px 20px;
+            display: flex;
+            flex-direction: column;
+            z-index: 100;
+            backdrop-filter: blur(20px);
+            overflow-y: auto;
+        }
+
+        .sb-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 28px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+        }
+        .sb-logo-icon {
+            width: 30px;
+            height: 30px;
+            border-radius: 10px;
+            background: #0a0a1a;
+            border: 1px solid rgba(255,255,255,0.05);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            flex-shrink: 0;
+        }
+        .sb-logo-icon::before {
+            content: '';
+            position: absolute;
+            width: 18px;
+            height: 18px;
+            border: 1px dashed rgba(52,211,153,0.4);
+            border-radius: 50%;
+            animation: spin 8s linear infinite;
+        }
+        .sb-logo-icon::after {
+            content: '';
+            position: absolute;
+            width: 7px;
+            height: 7px;
+            background: #34d399;
+            border-radius: 50%;
+            box-shadow: 0 0 8px #10b981;
+            animation: pulse-glow 2s ease-in-out infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes pulse-glow {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.6; transform: scale(1.3); }
+        }
+
+        .sb-logo-text {
+            font-size: 17px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #6ee7b7, #60a5fa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1.2;
+        }
+        .sb-logo-sub {
+            font-size: 8px;
+            color: rgba(255,255,255,0.2);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .sb-section {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: rgba(255,255,255,0.15);
+            margin: 16px 0 8px 4px;
+            font-weight: 600;
+        }
+
+        .sb-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 12px;
+            border-radius: 8px;
+            color: rgba(255,255,255,0.4);
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.2s;
+            margin-bottom: 2px;
+            position: relative;
+        }
+        .sb-item i { font-size: 16px; width: 20px; }
+        .sb-item:hover {
+            color: #ffffff;
+            background: rgba(255,255,255,0.04);
+        }
+        .sb-item.active {
+            color: #34d399;
+            background: rgba(16,185,129,0.08);
+        }
+        .sb-item.active::before {
+            content: '';
+            position: absolute;
+            left: -16px;
+            width: 3px;
+            height: 24px;
+            background: linear-gradient(180deg, #10b981, #3b82f6);
+            border-radius: 0 4px 4px 0;
+        }
+
+        .sb-badge {
+            background: linear-gradient(135deg, #10b981, #3b82f6);
+            color: #fff;
+            font-size: 8px;
+            padding: 1px 8px;
+            border-radius: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-left: auto;
+        }
+
+        .sb-footer {
+            margin-top: auto;
+            padding-top: 16px;
+            border-top: 1px solid rgba(255,255,255,0.04);
+        }
+        .sb-footer-label {
+            font-size: 10px;
+            color: rgba(255,255,255,0.2);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .sb-footer-val {
+            font-size: 15px;
+            font-weight: 700;
+            color: #34d399;
+            margin: 2px 0 6px;
+        }
+        .sb-mem-bar {
+            width: 100%;
+            height: 4px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .sb-mem-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #10b981, #3b82f6);
+            border-radius: 4px;
+            transition: width 0.5s;
+            width: 0%;
+        }
+
+        /* ===== MAIN CONTENT ===== */
+        .main {
+            margin-left: 200px;
+            padding: 24px 32px 40px;
+            min-height: 100vh;
+        }
+
+        /* ===== BACK BUTTON ===== */
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.06);
+            color: rgba(255,255,255,0.5);
+            padding: 6px 14px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-bottom: 12px;
+            font-family: inherit;
+            text-decoration: none;
+            width: fit-content;
+        }
+        .back-btn:hover {
+            background: rgba(255,255,255,0.08);
+            color: #ffffff;
+        }
+        .back-btn i {
+            font-size: 16px;
+        }
+
+        /* ===== TOPBAR ===== */
+        .topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+        }
+        .topbar-left h1 {
+            font-size: 24px;
+            font-weight: 700;
+        }
+        .topbar-left p {
+            font-size: 14px;
+            color: rgba(255,255,255,0.3);
+            margin-top: 2px;
+        }
+
+        /* ===== INTRO CARD ===== */
+        .intro-card {
+            background: linear-gradient(135deg, rgba(16,185,129,0.06), rgba(59,130,246,0.06));
+            border: 1px solid rgba(16,185,129,0.08);
+            border-radius: 16px;
+            padding: 28px 32px;
+            margin-bottom: 28px;
+            text-align: center;
+        }
+        .intro-card h2 {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+        .intro-card p {
+            color: rgba(255,255,255,0.4);
+            font-size: 15px;
+        }
+
+        /* ===== REMOVE BY KEYWORD ===== */
+        .remove-card {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.04);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 28px;
+        }
+        .remove-card h3 {
+            font-size: 17px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .remove-card h3 i {
+            color: #fbbf24;
+        }
+        .remove-card p {
+            font-size: 13px;
+            color: rgba(255,255,255,0.3);
+            margin-bottom: 14px;
+        }
+        .remove-card .row {
+            display: flex;
+            gap: 12px;
+        }
+        .remove-card input {
+            flex: 1;
+            padding: 12px 16px;
+            border-radius: 10px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.06);
+            color: #fff;
+            font-size: 14px;
+            outline: none;
+            font-family: inherit;
+        }
+        .remove-card input:focus {
+            border-color: rgba(251,191,36,0.3);
+        }
+        .remove-card input::placeholder {
+            color: rgba(255,255,255,0.2);
+        }
+        .remove-card button {
+            padding: 12px 32px;
+            border-radius: 10px;
+            border: none;
+            background: linear-gradient(135deg, #f59e0b, #fbbf24);
+            color: #060612;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+        .remove-card button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(251,191,36,0.25);
+        }
+        .remove-card button.danger {
+            background: linear-gradient(135deg, #ef4444, #f87171);
+            color: #fff;
+        }
+        .remove-card button.danger:hover {
+            box-shadow: 0 8px 24px rgba(239,68,68,0.25);
+        }
+
+        /* ===== DANGER ZONE ===== */
+        .danger-zone {
+            background: rgba(239,68,68,0.04);
+            border: 2px solid rgba(239,68,68,0.12);
+            border-radius: 16px;
+            padding: 24px;
+        }
+        .danger-zone h3 {
+            font-size: 17px;
+            font-weight: 600;
+            color: #f87171;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+        .danger-zone p {
+            font-size: 13px;
+            color: rgba(255,255,255,0.3);
+            margin-bottom: 14px;
+        }
+        .danger-zone .row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .danger-zone input {
+            padding: 10px 16px;
+            border-radius: 10px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(239,68,68,0.2);
+            color: #fff;
+            font-size: 14px;
+            outline: none;
+            font-family: inherit;
+            width: 180px;
+        }
+        .danger-zone input:focus {
+            border-color: rgba(239,68,68,0.4);
+        }
+        .danger-zone input::placeholder {
+            color: rgba(255,255,255,0.2);
+        }
+        .danger-zone button {
+            padding: 10px 28px;
+            border-radius: 10px;
+            border: none;
+            background: #ef4444;
+            color: #fff;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .danger-zone button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(239,68,68,0.3);
+        }
+        .danger-zone button:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+            transform: none !important;
+            box-shadow: none !important;
+        }
+
+        /* ===== TOAST ===== */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            padding: 16px 24px;
+            border-radius: 12px;
+            background: rgba(16,185,129,0.95);
+            color: #fff;
+            font-size: 14px;
+            font-weight: 500;
+            box-shadow: 0 12px 40px rgba(0,0,0,0.5);
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.4s;
+            z-index: 999;
+            border: 1px solid rgba(255,255,255,0.1);
+            max-width: 90%;
+        }
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        .toast.error {
+            background: rgba(239,68,68,0.95);
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .sidebar { width: 60px; padding: 16px 8px; }
+            .sidebar .sb-logo-text, .sidebar .sb-logo-sub, 
+            .sidebar .sb-section, .sidebar .sb-item span,
+            .sidebar .sb-badge, .sidebar .sb-footer-label,
+            .sidebar .sb-footer-val { display: none; }
+            .sidebar .sb-item { justify-content: center; padding: 10px; }
+            .sidebar .sb-item i { font-size: 20px; width: auto; }
+            .sidebar .sb-item.active::before { left: -8px; }
+            .main { margin-left: 60px; padding: 16px; }
+            .topbar { flex-direction: column; align-items: flex-start; gap: 8px; }
+            .remove-card .row { flex-direction: column; }
+            .danger-zone .row { flex-direction: column; align-items: stretch; }
+            .danger-zone input { width: 100%; }
+            .intro-card { padding: 20px; }
+            .back-btn { margin-bottom: 8px; font-size: 12px; padding: 4px 10px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ===== SIDEBAR ===== -->
+    <div class="sidebar">
+        <div class="sb-logo">
+            <div class="sb-logo-icon"></div>
+            <div>
+                <div class="sb-logo-text">CogneeCode</div>
+                <div class="sb-logo-sub">Developer Memory</div>
+            </div>
+        </div>
+
+        <div class="sb-section">Main</div>
+        <a href="/dashboard" class="sb-item">
+            <i class="ti ti-layout-dashboard"></i> <span>Dashboard</span>
+        </a>
+        <a href="/ask" class="sb-item">
+            <i class="ti ti-message-circle"></i> <span>Ask Codebase</span>
+            <span class="sb-badge">AI</span>
+        </a>
+        <a href="/search" class="sb-item">
+            <i class="ti ti-search"></i> <span>Search Memory</span>
+        </a>
+
+        <div class="sb-section">Remember</div>
+        <a href="/decisions" class="sb-item">
+            <i class="ti ti-bulb"></i> <span>Decisions</span>
+        </a>
+        <a href="/bugs" class="sb-item">
+            <i class="ti ti-bug"></i> <span>Bug Fixes</span>
+        </a>
+
+        <div class="sb-section">Visualize</div>
+        <a href="/graph-view" class="sb-item">
+            <i class="ti ti-clock"></i> <span>Timeline</span>
+        </a>
+        <a href="/analytics" class="sb-item">
+            <i class="ti ti-chart-bar"></i> <span>Analytics</span>
+        </a>
+
+        <div class="sb-section">Manage</div>
+        <a href="/forget" class="sb-item active">
+            <i class="ti ti-trash"></i> <span>Forget</span>
+        </a>
+
+        <div class="sb-footer">
+            <div class="sb-footer-label">Memories stored</div>
+            <div class="sb-footer-val" id="memCount">Loading...</div>
+            <div class="sb-mem-bar">
+                <div class="sb-mem-fill" id="memBar"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <div class="main">
+
+        <!-- ===== BACK BUTTON ===== -->
+        <a href="/" class="back-btn">
+            <i class="ti ti-arrow-left"></i> Back to Landing
+        </a>
+
+        <!-- ===== TOPBAR ===== -->
+        <div class="topbar">
+            <div class="topbar-left">
+                <h1>Forget</h1>
+                <p>Remove outdated knowledge</p>
+            </div>
+        </div>
+
+        <!-- ===== INTRO CARD ===== -->
+        <div class="intro-card">
+            <h2>🧹 Sometimes knowledge becomes outdated</h2>
+            <p>Remove old decisions or incorrect information from your memory graph</p>
+        </div>
+
+        <!-- ===== REMOVE BY KEYWORD ===== -->
+        <div class="remove-card">
+            <h3><i class="ti ti-search"></i> Remove by keyword</h3>
+            <p>Describe what you want to forget or paste keywords</p>
+            <div class="row">
+                <input 
+                    id="forgetInput" 
+                    type="text" 
+                    placeholder="What do you want to forget? (e.g. 'old decision about PostgreSQL')"
+                    onkeypress="if(event.key==='Enter') releaseMemory()"
+                />
+                <button onclick="releaseMemory()">
+                    <i class="ti ti-trash"></i> Remove from memory
+                </button>
+            </div>
+        </div>
+
+        <!-- ===== DANGER ZONE ===== -->
+        <div class="danger-zone">
+            <h3><i class="ti ti-alert-triangle"></i> Danger Zone</h3>
+            <p>Clear all memories — this action cannot be undone!</p>
+            <div class="row">
+                <input 
+                    id="confirmForget" 
+                    type="text" 
+                    placeholder='Type "FORGET" to confirm'
+                    onkeyup="checkForgetConfirm()"
+                />
+                <button id="dangerBtn" onclick="confirmForgetAll()" disabled>
+                    <i class="ti ti-trash"></i> Clear all memories
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ===== TOAST ===== -->
+    <div class="toast" id="toast"></div>
+
+    <!-- ===== SCRIPTS ===== -->
+    <script>
+        // ===== SIDEBAR STATS =====
+        async function loadSidebarStats() {
+            try {
+                const res = await fetch('/api/stats');
+                const data = await res.json();
+                const el = document.getElementById('memCount');
+                const bar = document.getElementById('memBar');
+                if (el) el.textContent = (data.memories || 0) + ' memories';
+                if (bar) bar.style.width = Math.min((data.memories || 0), 100) + '%';
+            } catch(e) {
+                const el = document.getElementById('memCount');
+                if (el) el.textContent = '0 memories';
+            }
+        }
+        loadSidebarStats();
+
+        // ===== TOAST =====
+        function showToast(message, isError = false) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = 'toast' + (isError ? ' error' : '');
+            setTimeout(() => toast.classList.add('show'), 10);
+            setTimeout(() => toast.classList.remove('show'), 3500);
+        }
+
+        // ===== RELEASE MEMORY =====
+        async function releaseMemory() {
+            const input = document.getElementById('forgetInput');
+            const text = input.value.trim();
+
+            if (!text) {
+                showToast('⚠️ Please describe what you want to forget', true);
+                return;
+            }
+
+            if (!confirm(`Are you sure you want to remove memories related to: "${text}"?`)) {
+                return;
+            }
+
+            try {
+                const res = await fetch('/api/forget', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ dataset: 'cogneecode' })
+                });
+
+                const data = await res.json();
+
+                if (data.status === 'success') {
+                    showToast('✅ Removed from knowledge graph.');
+                    input.value = '';
+                    loadSidebarStats();
+                } else {
+                    showToast('❌ Error: ' + data.message, true);
+                }
+            } catch (e) {
+                const keyword = text.toLowerCase();
+                let removed = 0;
+
+                let decisions = JSON.parse(localStorage.getItem('cc_decisions') || '[]');
+                const filteredDecisions = decisions.filter(d => 
+                    !d.title.toLowerCase().includes(keyword) && 
+                    !d.context.toLowerCase().includes(keyword)
+                );
+                removed += decisions.length - filteredDecisions.length;
+                localStorage.setItem('cc_decisions', JSON.stringify(filteredDecisions));
+
+                let bugs = JSON.parse(localStorage.getItem('cc_bugs') || '[]');
+                const filteredBugs = bugs.filter(b => 
+                    !b.description.toLowerCase().includes(keyword) && 
+                    !b.solution.toLowerCase().includes(keyword) &&
+                    !b.error.toLowerCase().includes(keyword)
+                );
+                removed += bugs.length - filteredBugs.length;
+                localStorage.setItem('cc_bugs', JSON.stringify(filteredBugs));
+
+                if (removed > 0) {
+                    showToast(`✅ Removed ${removed} memories containing "${text}"`);
+                    input.value = '';
+                    loadSidebarStats();
+                } else {
+                    showToast(`ℹ️ No memories found containing "${text}"`);
+                }
+            }
+        }
+
+        // ===== CHECK FORGET CONFIRM =====
+        function checkForgetConfirm() {
+            const input = document.getElementById('confirmForget');
+            const btn = document.getElementById('dangerBtn');
+            if (input.value === 'FORGET') {
+                btn.disabled = false;
+                btn.style.opacity = '1';
+            } else {
+                btn.disabled = true;
+                btn.style.opacity = '0.3';
+            }
+        }
+
+        // ===== CONFIRM FORGET ALL =====
+        async function confirmForgetAll() {
+            const input = document.getElementById('confirmForget');
+            
+            if (input.value !== 'FORGET') {
+                showToast('⚠️ Please type "FORGET" to confirm', true);
+                return;
+            }
+
+            if (!confirm('⚠️ DANGER: This will delete ALL memories! This cannot be undone. Are you sure?')) {
+                return;
+            }
+
+            if (!confirm('⚠️ FINAL WARNING: Delete everything from your knowledge graph?')) {
+                return;
+            }
+
+            try {
+                const res = await fetch('/api/forget', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ dataset: 'cogneecode', everything: true })
+                });
+
+                const data = await res.json();
+
+                localStorage.removeItem('cc_decisions');
+                localStorage.removeItem('cc_bugs');
+                localStorage.removeItem('cc_recent_search');
+
+                if (data.status === 'success') {
+                    showToast('🗑️ All memories cleared successfully!');
+                    input.value = '';
+                    document.getElementById('dangerBtn').disabled = true;
+                    loadSidebarStats();
+                } else {
+                    showToast('❌ Error: ' + data.message, true);
+                }
+            } catch (e) {
+                localStorage.removeItem('cc_decisions');
+                localStorage.removeItem('cc_bugs');
+                localStorage.removeItem('cc_recent_search');
+                showToast('🗑️ All memories cleared successfully!');
+                input.value = '';
+                document.getElementById('dangerBtn').disabled = true;
+                loadSidebarStats();
+            }
+        }
+    </script>
+
+</body>
+</html>

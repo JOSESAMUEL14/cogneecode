@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Timeline — CogneeCode</title>
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+    
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: #060612;
+            color: #ffffff;
+            overflow-x: hidden;
+            height: 100vh;
+        }
+        a { text-decoration: none; color: inherit; }
+        
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #030309; }
+        ::-webkit-scrollbar-thumb { background: linear-gradient(135deg, #10b981, #3b82f6); border-radius: 10px; }
+
+        /* ===== SIDEBAR ===== */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 200px;
+            height: 100vh;
+            background: rgba(8, 8, 18, 0.98);
+            border-right: 1px solid rgba(255,255,255,0.05);
+            padding: 24px 16px 20px;
+            display: flex;
+            flex-direction: column;
+            z-index: 100;
+            backdrop-filter: blur(20px);
+            overflow-y: auto;
+        }
+
+        .sb-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 28px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+        }
+        .sb-logo-icon {
+            width: 30px;
+            height: 30px;
+            border-radius: 10px;
+            background: #0a0a1a;
+            border: 1px solid rgba(255,255,255,0.05);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            flex-shrink: 0;
+        }
+        .sb-logo-icon::before {
+            content: '';
+            position: absolute;
+            width: 18px;
+            height: 18px;
+            border: 1px dashed rgba(52,211,153,0.4);
+            border-radius: 50%;
+            animation: spin 8s linear infinite;
+        }
+        .sb-logo-icon::after {
+            content: '';
+            position: absolute;
+            width: 7px;
+            height: 7px;
+            background: #34d399;
+            border-radius: 50%;
+            box-shadow: 0 0 8px #10b981;
+            animation: pulse-glow 2s ease-in-out infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes pulse-glow {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.6; transform: scale(1.3); }
+        }
+
+        .sb-logo-text {
+            font-size: 17px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #6ee7b7, #60a5fa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1.2;
+        }
+        .sb-logo-sub {
+            font-size: 8px;
+            color: rgba(255,255,255,0.2);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .sb-section {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: rgba(255,255,255,0.15);
+            margin: 16px 0 8px 4px;
+            font-weight: 600;
+        }
+
+        .sb-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 12px;
+            border-radius: 8px;
+            color: rgba(255,255,255,0.4);
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.2s;
+            margin-bottom: 2px;
+            position: relative;
+        }
+        .sb-item i { font-size: 16px; width: 20px; }
+        .sb-item:hover {
+            color: #ffffff;
+            background: rgba(255,255,255,0.04);
+        }
+        .sb-item.active {
+            color: #34d399;
+            background: rgba(16,185,129,0.08);
+        }
+        .sb-item.active::before {
+            content: '';
+            position: absolute;
+            left: -16px;
+            width: 3px;
+            height: 24px;
+            background: linear-gradient(180deg, #10b981, #3b82f6);
+            border-radius: 0 4px 4px 0;
+        }
+
+        .sb-badge {
+            background: linear-gradient(135deg, #10b981, #3b82f6);
+            color: #fff;
+            font-size: 8px;
+            padding: 1px 8px;
+            border-radius: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-left: auto;
+        }
+
+        .sb-footer {
+            margin-top: auto;
+            padding-top: 16px;
+            border-top: 1px solid rgba(255,255,255,0.04);
+        }
+        .sb-footer-label {
+            font-size: 10px;
+            color: rgba(255,255,255,0.2);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .sb-footer-val {
+            font-size: 15px;
+            font-weight: 700;
+            color: #34d399;
+            margin: 2px 0 6px;
+        }
+        .sb-mem-bar {
+            width: 100%;
+            height: 4px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .sb-mem-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #10b981, #3b82f6);
+            border-radius: 4px;
+            transition: width 0.5s;
+            width: 0%;
+        }
+
+        /* ===== MAIN CONTENT ===== */
+        .main {
+            margin-left: 200px;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ===== BACK BUTTON ===== */
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.06);
+            color: rgba(255,255,255,0.5);
+            padding: 6px 14px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin: 16px 32px 8px 32px;
+            font-family: inherit;
+            text-decoration: none;
+            width: fit-content;
+        }
+        .back-btn:hover {
+            background: rgba(255,255,255,0.08);
+            color: #ffffff;
+        }
+        .back-btn i {
+            font-size: 16px;
+        }
+
+        /* ===== TOPBAR ===== */
+        .topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 32px 12px 32px;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+            flex-shrink: 0;
+            background: rgba(6, 6, 18, 0.8);
+            backdrop-filter: blur(10px);
+        }
+        .topbar-left h1 {
+            font-size: 20px;
+            font-weight: 700;
+        }
+        .topbar-left h1 i {
+            color: #34d399;
+        }
+        .topbar-left p {
+            font-size: 13px;
+            color: rgba(255,255,255,0.3);
+            margin-top: 2px;
+        }
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .topbar-btn {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.06);
+            color: rgba(255,255,255,0.5);
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+        .topbar-btn:hover {
+            background: rgba(255,255,255,0.08);
+            color: #ffffff;
+        }
+        .topbar-btn i {
+            margin-right: 4px;
+        }
+
+        /* ===== TIMELINE ===== */
+        .timeline-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px 32px 40px;
+        }
+
+        .timeline {
+            position: relative;
+            padding-left: 32px;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 8px;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: linear-gradient(180deg, #10b981, #3b82f6, #7c3aed);
+            border-radius: 4px;
+            opacity: 0.3;
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 32px;
+            padding-left: 32px;
+            animation: slideIn 0.5s ease;
+        }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -24px;
+            top: 4px;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            border: 3px solid #10b981;
+            background: #060612;
+            box-shadow: 0 0 20px rgba(16,185,129,0.2);
+            z-index: 1;
+        }
+
+        .timeline-item.decision::before {
+            border-color: #a78bfa;
+            box-shadow: 0 0 20px rgba(124,58,237,0.2);
+        }
+        .timeline-item.bug::before {
+            border-color: #f87171;
+            box-shadow: 0 0 20px rgba(239,68,68,0.2);
+        }
+        .timeline-item.skill::before {
+            border-color: #34d399;
+            box-shadow: 0 0 20px rgba(52,211,153,0.2);
+        }
+        .timeline-item.general::before {
+            border-color: #60a5fa;
+            box-shadow: 0 0 20px rgba(96,165,250,0.2);
+        }
+
+        .timeline-card {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.04);
+            border-radius: 12px;
+            padding: 16px 20px;
+            transition: all 0.3s;
+            cursor: default;
+        }
+        .timeline-card:hover {
+            border-color: rgba(16,185,129,0.1);
+            transform: translateX(4px);
+            background: rgba(255,255,255,0.03);
+        }
+
+        .timeline-card .header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 6px;
+            flex-wrap: wrap;
+        }
+        .timeline-card .badge {
+            font-size: 9px;
+            padding: 2px 10px;
+            border-radius: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .badge.decision { background: rgba(124,58,237,0.12); color: #a78bfa; }
+        .badge.bug { background: rgba(239,68,68,0.12); color: #f87171; }
+        .badge.skill { background: rgba(52,211,153,0.12); color: #34d399; }
+        .badge.general { background: rgba(96,165,250,0.12); color: #60a5fa; }
+
+        .timeline-card .date {
+            font-size: 11px;
+            color: rgba(255,255,255,0.2);
+            margin-left: auto;
+        }
+        .timeline-card .title {
+            font-size: 15px;
+            font-weight: 600;
+            color: rgba(255,255,255,0.8);
+        }
+        .timeline-card .description {
+            font-size: 13px;
+            color: rgba(255,255,255,0.4);
+            margin-top: 4px;
+            line-height: 1.6;
+        }
+        .timeline-card .tags {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            margin-top: 8px;
+        }
+        .timeline-card .tag {
+            font-size: 9px;
+            padding: 2px 8px;
+            border-radius: 8px;
+            background: rgba(255,255,255,0.04);
+            color: rgba(255,255,255,0.2);
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .timeline-card .actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px;
+        }
+        .timeline-card .actions button {
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+            font-family: inherit;
+            background: rgba(16,185,129,0.08);
+            color: #34d399;
+        }
+        .timeline-card .actions button:hover {
+            background: rgba(16,185,129,0.15);
+        }
+        .timeline-card .actions .delete-btn {
+            background: rgba(239,68,68,0.08);
+            color: #f87171;
+        }
+        .timeline-card .actions .delete-btn:hover {
+            background: rgba(239,68,68,0.15);
+        }
+
+        .empty-timeline {
+            text-align: center;
+            padding: 60px 20px;
+            color: rgba(255,255,255,0.15);
+        }
+        .empty-timeline i {
+            font-size: 48px;
+            display: block;
+            margin-bottom: 16px;
+            opacity: 0.3;
+            color: #10b981;
+        }
+        .empty-timeline h3 {
+            font-size: 18px;
+            color: rgba(255,255,255,0.3);
+        }
+        .empty-timeline p {
+            font-size: 14px;
+            color: rgba(255,255,255,0.15);
+            max-width: 400px;
+            margin: 6px auto 0;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar { width: 60px; padding: 16px 8px; }
+            .sidebar .sb-logo-text, .sidebar .sb-logo-sub, 
+            .sidebar .sb-section, .sidebar .sb-item span,
+            .sidebar .sb-badge, .sidebar .sb-footer-label,
+            .sidebar .sb-footer-val { display: none; }
+            .sidebar .sb-item { justify-content: center; padding: 10px; }
+            .sidebar .sb-item i { font-size: 20px; width: auto; }
+            .sidebar .sb-item.active::before { left: -8px; }
+            .main { margin-left: 60px; }
+            .topbar { padding: 12px 16px; flex-wrap: wrap; gap: 8px; }
+            .topbar-left h1 { font-size: 17px; }
+            .timeline-container { padding: 16px; }
+            .timeline { padding-left: 24px; }
+            .timeline-item { padding-left: 24px; }
+            .timeline-item::before { left: -18px; width: 12px; height: 12px; }
+            .timeline-card .header { flex-direction: column; align-items: flex-start; }
+            .timeline-card .date { margin-left: 0; }
+            .back-btn { margin: 12px 16px 4px 16px; font-size: 12px; padding: 4px 10px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ===== SIDEBAR ===== -->
+    <div class="sidebar">
+        <div class="sb-logo">
+            <div class="sb-logo-icon"></div>
+            <div>
+                <div class="sb-logo-text">CogneeCode</div>
+                <div class="sb-logo-sub">Developer Memory</div>
+            </div>
+        </div>
+
+        <div class="sb-section">Main</div>
+        <a href="/dashboard" class="sb-item">
+            <i class="ti ti-layout-dashboard"></i> <span>Dashboard</span>
+        </a>
+        <a href="/ask" class="sb-item">
+            <i class="ti ti-message-circle"></i> <span>Ask Codebase</span>
+            <span class="sb-badge">AI</span>
+        </a>
+        <a href="/search" class="sb-item">
+            <i class="ti ti-search"></i> <span>Search Memory</span>
+        </a>
+
+        <div class="sb-section">Remember</div>
+        <a href="/decisions" class="sb-item">
+            <i class="ti ti-bulb"></i> <span>Decisions</span>
+        </a>
+        <a href="/bugs" class="sb-item">
+            <i class="ti ti-bug"></i> <span>Bug Fixes</span>
+        </a>
+
+        <div class="sb-section">Visualize</div>
+        <a href="/graph-view" class="sb-item active">
+            <i class="ti ti-clock"></i> <span>Timeline</span>
+        </a>
+        <a href="/analytics" class="sb-item">
+            <i class="ti ti-chart-bar"></i> <span>Analytics</span>
+        </a>
+
+        <div class="sb-section">Manage</div>
+        <a href="/forget" class="sb-item">
+            <i class="ti ti-trash"></i> <span>Forget</span>
+        </a>
+
+        <div class="sb-footer">
+            <div class="sb-footer-label">Memories stored</div>
+            <div class="sb-footer-val" id="memCount">Loading...</div>
+            <div class="sb-mem-bar">
+                <div class="sb-mem-fill" id="memBar"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <div class="main">
+
+        <!-- ===== BACK BUTTON ===== -->
+        <a href="/" class="back-btn">
+            <i class="ti ti-arrow-left"></i> Back to Landing
+        </a>
+
+        <!-- ===== TOPBAR ===== -->
+        <div class="topbar">
+            <div class="topbar-left">
+                <h1><i class="ti ti-clock"></i> Memory Timeline</h1>
+                <p>Chronological view of your developer memory</p>
+            </div>
+            <div class="topbar-right">
+                <button class="topbar-btn" onclick="refreshTimeline()">
+                    <i class="ti ti-refresh"></i> Refresh
+                </button>
+            </div>
+        </div>
+
+        <div class="timeline-container">
+            <div class="timeline" id="timelineContent">
+                <!-- Rendered by JavaScript -->
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // ===== SIDEBAR STATS =====
+        async function loadSidebarStats() {
+            try {
+                const res = await fetch('/api/stats');
+                const data = await res.json();
+                const el = document.getElementById('memCount');
+                const bar = document.getElementById('memBar');
+                if (el) el.textContent = (data.memories || 0) + ' memories';
+                if (bar) bar.style.width = Math.min((data.memories || 0), 100) + '%';
+            } catch(e) {
+                const el = document.getElementById('memCount');
+                if (el) el.textContent = '0 memories';
+            }
+        }
+        loadSidebarStats();
+
+        // ===== RENDER TIMELINE =====
+        function renderTimeline() {
+            const container = document.getElementById('timelineContent');
+            const decisions = JSON.parse(localStorage.getItem('cc_decisions') || '[]');
+            const bugs = JSON.parse(localStorage.getItem('cc_bugs') || '[]');
+
+            const all = [];
+
+            decisions.forEach(d => {
+                all.push({
+                    id: d.id,
+                    type: 'decision',
+                    title: d.title,
+                    description: d.context,
+                    tags: d.tags ? d.tags.split(',').map(t => t.trim()) : [],
+                    date: d.date,
+                    icon: '💡'
+                });
+            });
+
+            bugs.forEach(b => {
+                all.push({
+                    id: b.id,
+                    type: 'bug',
+                    title: b.description,
+                    description: b.solution || b.error || '',
+                    tags: [b.language || 'General'],
+                    date: b.date,
+                    icon: '🐛'
+                });
+            });
+
+            all.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+            if (all.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-timeline">
+                        <i class="ti ti-clock"></i>
+                        <h3>No Memories Yet</h3>
+                        <p>Start logging decisions and bug fixes to build your memory timeline!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = all.map((item, index) => `
+                <div class="timeline-item ${item.type}" style="animation-delay: ${index * 0.05}s">
+                    <div class="timeline-card">
+                        <div class="header">
+                            <span class="badge ${item.type}">${item.type}</span>
+                            <span class="date">${new Date(item.date).toLocaleDateString('en-US', { 
+                                year: 'numeric', 
+                                month: 'short', 
+                                day: 'numeric',
+                                hour: '2-digit',
+                                minute: '2-digit'
+                            })}</span>
+                        </div>
+                        <div class="title">${item.icon} ${item.title}</div>
+                        ${item.description ? `<div class="description">${item.description.substring(0, 150)}${item.description.length > 150 ? '...' : ''}</div>` : ''}
+                        ${item.tags && item.tags.length > 0 ? `
+                            <div class="tags">
+                                ${item.tags.map(t => `<span class="tag">#${t}</span>`).join('')}
+                            </div>
+                        ` : ''}
+                        <div class="actions">
+                            <button onclick="askAbout('${item.title.replace(/'/g, "\\'")}')">
+                                <i class="ti ti-message-circle"></i> Ask about this
+                            </button>
+                            <button class="delete-btn" onclick="deleteMemory(${item.id}, '${item.type}')">
+                                <i class="ti ti-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // ===== ASK ABOUT =====
+        function askAbout(title) {
+            window.location.href = `/ask?q=Tell me about: ${encodeURIComponent(title)}`;
+        }
+
+        // ===== DELETE MEMORY =====
+        function deleteMemory(id, type) {
+            if (!confirm('Delete this memory?')) return;
+
+            if (type === 'decision') {
+                let decisions = JSON.parse(localStorage.getItem('cc_decisions') || '[]');
+                decisions = decisions.filter(d => d.id !== id);
+                localStorage.setItem('cc_decisions', JSON.stringify(decisions));
+            } else if (type === 'bug') {
+                let bugs = JSON.parse(localStorage.getItem('cc_bugs') || '[]');
+                bugs = bugs.filter(b => b.id !== id);
+                localStorage.setItem('cc_bugs', JSON.stringify(bugs));
+            }
+
+            renderTimeline();
+            loadSidebarStats();
+            showToast('🗑️ Memory deleted');
+        }
+
+        // ===== TOAST =====
+        function showToast(message) {
+            const toast = document.createElement('div');
+            toast.style.cssText = `
+                position: fixed; bottom: 30px; right: 30px;
+                padding: 14px 24px; border-radius: 12px;
+                background: rgba(16,185,129,0.95);
+                color: #fff; font-size: 14px; font-weight: 500;
+                box-shadow: 0 12px 40px rgba(0,0,0,0.5);
+                z-index: 999; border: 1px solid rgba(255,255,255,0.1);
+                transition: all 0.4s; transform: translateY(100px); opacity: 0;
+                max-width: 90%;
+            `;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            setTimeout(() => { toast.style.transform = 'translateY(0)'; toast.style.opacity = '1'; }, 10);
+            setTimeout(() => { 
+                toast.style.transform = 'translateY(100px)'; 
+                toast.style.opacity = '0'; 
+                setTimeout(() => toast.remove(), 400);
+            }, 3000);
+        }
+
+        // ===== REFRESH =====
+        function refreshTimeline() {
+            renderTimeline();
+            loadSidebarStats();
+            showToast('📊 Timeline refreshed!');
+        }
+
+        // ===== LOAD =====
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(renderTimeline, 300);
+        });
+    </script>
+
+</body>
+</html>
