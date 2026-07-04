@@ -1,4 +1,4 @@
-# cogneecode/app.py - COGNEE CLOUD EDITION (REAL LLM + MEMORY - FINAL)
+# cogneecode/app.py - COGNEE CLOUD EDITION (REAL LLM + MEMORY - FIXED FOR RENDER)
 from flask import Flask, render_template, request, jsonify
 from datetime import datetime
 import os
@@ -21,39 +21,66 @@ mock_memory = {
 # ===== PAGE ROUTES =====
 @app.route('/')
 def landing():
-    return render_template('landing.html')
+    try:
+        return render_template('landing.html')
+    except Exception as e:
+        return f"<h1>CogneeCode</h1><p>Landing page loading. Error: {str(e)}</p><p>Visit <a href='/dashboard'>Dashboard</a></p>"
 
 @app.route('/dashboard')
 def dashboard():
-    return render_template('dashboard.html')
+    try:
+        return render_template('dashboard.html')
+    except Exception as e:
+        return f"<h1>Dashboard</h1><p>Loading error: {str(e)}</p>"
 
 @app.route('/ask')
 def ask():
-    return render_template('ask.html')
+    try:
+        return render_template('ask.html')
+    except Exception as e:
+        return f"<h1>Ask</h1><p>Loading error: {str(e)}</p>"
 
 @app.route('/decisions')
 def decisions():
-    return render_template('decisions.html')
+    try:
+        return render_template('decisions.html')
+    except Exception as e:
+        return f"<h1>Decisions</h1><p>Loading error: {str(e)}</p>"
 
 @app.route('/bugs')
 def bugs():
-    return render_template('bugs.html')
+    try:
+        return render_template('bugs.html')
+    except Exception as e:
+        return f"<h1>Bugs</h1><p>Loading error: {str(e)}</p>"
 
 @app.route('/search')
 def search():
-    return render_template('search.html')
+    try:
+        return render_template('search.html')
+    except Exception as e:
+        return f"<h1>Search</h1><p>Loading error: {str(e)}</p>"
 
 @app.route('/forget')
 def forget_page():
-    return render_template('forget.html')
+    try:
+        return render_template('forget.html')
+    except Exception as e:
+        return f"<h1>Forget</h1><p>Loading error: {str(e)}</p>"
 
 @app.route('/graph-view')
 def graph_view():
-    return render_template('graph.html')
+    try:
+        return render_template('graph.html')
+    except Exception as e:
+        return f"<h1>Timeline</h1><p>Loading error: {str(e)}</p>"
 
 @app.route('/analytics')
 def analytics():
-    return render_template('analytics.html')
+    try:
+        return render_template('analytics.html')
+    except Exception as e:
+        return f"<h1>Analytics</h1><p>Loading error: {str(e)}</p>"
 
 # ===== API ROUTES =====
 
@@ -81,10 +108,6 @@ def api_ask():
         
         print(f"📤 Question: {question}")
         query = question.lower()
-        
-        # ============================================================
-        # IMPROVED MEMORY CHECK
-        # ============================================================
         
         # === USER NAME ===
         if "my name" in query and ("what" in query or "remember" in query):
@@ -118,7 +141,6 @@ def api_ask():
             parts = question.split("is")
             if len(parts) > 1:
                 cat_name = parts[-1].strip().strip('.,!?')
-                # Only store if the name doesn't contain "dog"
                 if "dog" not in cat_name.lower():
                     mock_memory["cat_name"] = cat_name
                     return jsonify({
@@ -132,7 +154,6 @@ def api_ask():
             parts = question.split("is")
             if len(parts) > 1:
                 dog_name = parts[-1].strip().strip('.,!?')
-                # Only store if the name doesn't contain "cat"
                 if "cat" not in dog_name.lower():
                     mock_memory["dog_name"] = dog_name
                     return jsonify({
@@ -371,10 +392,11 @@ def api_similar_bugs():
 
 if __name__ == '__main__':
     print("=" * 50)
-    print("🚀 CogneeCode (Real LLM + Memory - FINAL)")
+    print("🚀 CogneeCode (Deployed on Render)")
     print("=" * 50)
-    print("📊 Forced memory check BEFORE Groq")
-    print("📝 Now remembers names, cats, and dogs!")
-    print("\n📝 Visit http://127.0.0.1:5000")
+    print("📊 Live at: https://cognecode.onrender.com")
+    print("📝 Ready for hackathon submission!")
     print("=" * 50)
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    # Use port 8080 for Render
+    port = int(os.environ.get("PORT", 8080))
+    app.run(debug=False, host='0.0.0.0', port=port)
