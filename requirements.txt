@@ -2,3 +2,4 @@ cognee
 flask
 python-dotenv
 fastembed
+groq
