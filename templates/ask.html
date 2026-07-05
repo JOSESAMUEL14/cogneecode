@@ -1,1008 +1,134 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Ask Codebase — CogneeCode</title>
-    
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
-    
+    <title>Chat with CogneeCode</title>
     <style>
-        /* ===== RESET & BASE ===== */
-        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-family: Arial, sans-serif;
             background: #060612;
-            color: #ffffff;
-            overflow: hidden;
-            height: 100vh;
-            line-height: 1.6;
-        }
-        a { text-decoration: none; color: inherit; }
-        
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: #030309; }
-        ::-webkit-scrollbar-thumb { background: linear-gradient(135deg, #10b981, #3b82f6); border-radius: 10px; }
-
-        /* ===== SIDEBAR ===== */
-        .sidebar {
-            position: fixed;
-            left: 0;
-            top: 0;
-            width: 200px;
-            height: 100vh;
-            background: rgba(8, 8, 18, 0.98);
-            border-right: 1px solid rgba(255,255,255,0.05);
-            padding: 24px 16px 20px;
+            color: #fff;
             display: flex;
-            flex-direction: column;
-            z-index: 100;
-            backdrop-filter: blur(20px);
-            overflow-y: auto;
-        }
-
-        .sb-logo {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 28px;
-            padding-bottom: 20px;
-            border-bottom: 1px solid rgba(255,255,255,0.04);
-        }
-        .sb-logo-icon {
-            width: 30px;
-            height: 30px;
-            border-radius: 10px;
-            background: #0a0a1a;
-            border: 1px solid rgba(255,255,255,0.05);
-            display: flex;
-            align-items: center;
             justify-content: center;
-            position: relative;
-            flex-shrink: 0;
-        }
-        .sb-logo-icon::before {
-            content: '';
-            position: absolute;
-            width: 18px;
-            height: 18px;
-            border: 1px dashed rgba(52,211,153,0.4);
-            border-radius: 50%;
-            animation: spin 8s linear infinite;
-        }
-        .sb-logo-icon::after {
-            content: '';
-            position: absolute;
-            width: 7px;
-            height: 7px;
-            background: #34d399;
-            border-radius: 50%;
-            box-shadow: 0 0 8px #10b981;
-            animation: pulse-glow 2s ease-in-out infinite;
-        }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        @keyframes pulse-glow {
-            0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.6; transform: scale(1.3); }
-        }
-
-        .sb-logo-text {
-            font-size: 17px;
-            font-weight: 700;
-            background: linear-gradient(135deg, #6ee7b7, #60a5fa);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            line-height: 1.2;
-        }
-        .sb-logo-sub {
-            font-size: 8px;
-            color: rgba(255,255,255,0.2);
-            letter-spacing: 2px;
-            text-transform: uppercase;
-        }
-
-        .sb-section {
-            font-size: 10px;
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-            color: rgba(255,255,255,0.15);
-            margin: 16px 0 8px 4px;
-            font-weight: 600;
-        }
-
-        .sb-item {
-            display: flex;
             align-items: center;
-            gap: 10px;
-            padding: 8px 12px;
-            border-radius: 8px;
-            color: rgba(255,255,255,0.4);
-            font-size: 13px;
-            font-weight: 500;
-            transition: all 0.2s;
-            margin-bottom: 2px;
-            position: relative;
-        }
-        .sb-item i { font-size: 16px; width: 20px; }
-        .sb-item:hover {
-            color: #ffffff;
-            background: rgba(255,255,255,0.04);
-        }
-        .sb-item.active {
-            color: #34d399;
-            background: rgba(16,185,129,0.08);
-        }
-        .sb-item.active::before {
-            content: '';
-            position: absolute;
-            left: -16px;
-            width: 3px;
-            height: 24px;
-            background: linear-gradient(180deg, #10b981, #3b82f6);
-            border-radius: 0 4px 4px 0;
-        }
-
-        .sb-badge {
-            background: linear-gradient(135deg, #10b981, #3b82f6);
-            color: #fff;
-            font-size: 8px;
-            padding: 1px 8px;
-            border-radius: 10px;
-            font-weight: 700;
-            text-transform: uppercase;
-            margin-left: auto;
-        }
-
-        .sb-footer {
-            margin-top: auto;
-            padding-top: 16px;
-            border-top: 1px solid rgba(255,255,255,0.04);
-        }
-        .sb-footer-label {
-            font-size: 10px;
-            color: rgba(255,255,255,0.2);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        .sb-footer-val {
-            font-size: 15px;
-            font-weight: 700;
-            color: #34d399;
-            margin: 2px 0 6px;
-        }
-        .sb-mem-bar {
-            width: 100%;
-            height: 4px;
-            background: rgba(255,255,255,0.05);
-            border-radius: 4px;
-            overflow: hidden;
-        }
-        .sb-mem-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #10b981, #3b82f6);
-            border-radius: 4px;
-            transition: width 0.5s;
-            width: 0%;
-        }
-
-        /* ===== MAIN CONTENT ===== */
-        .main {
-            margin-left: 200px;
             height: 100vh;
-            display: flex;
-            flex-direction: column;
+            margin: 0;
         }
-
-        /* ===== BACK BUTTON ===== */
-        .back-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
+        .chat-box {
+            width: 600px;
+            max-width: 90%;
             background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,255,255,0.06);
-            color: rgba(255,255,255,0.5);
-            padding: 6px 14px;
-            border-radius: 8px;
-            font-size: 13px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s;
-            margin: 16px 32px 8px 32px;
-            font-family: inherit;
-            text-decoration: none;
-            width: fit-content;
+            border-radius: 16px;
+            padding: 20px;
+            border: 1px solid rgba(255,255,255,0.1);
         }
-        .back-btn:hover {
-            background: rgba(255,255,255,0.08);
-            color: #ffffff;
-        }
-        .back-btn i {
-            font-size: 16px;
-        }
-
-        /* ===== TOPBAR ===== */
-        .topbar {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 8px 32px 12px 32px;
-            border-bottom: 1px solid rgba(255,255,255,0.04);
-            flex-shrink: 0;
-            background: rgba(6, 6, 18, 0.8);
-            backdrop-filter: blur(10px);
-        }
-        .topbar-left h1 {
-            font-size: 20px;
-            font-weight: 700;
-        }
-        .topbar-left p {
-            font-size: 13px;
-            color: rgba(255,255,255,0.3);
-            margin-top: 2px;
-        }
-        .topbar-right {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-        .topbar-btn {
-            background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,255,255,0.06);
-            color: rgba(255,255,255,0.5);
-            padding: 8px 16px;
-            border-radius: 8px;
-            font-size: 13px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        .topbar-btn:hover {
-            background: rgba(255,255,255,0.08);
-            color: #ffffff;
-        }
-        .topbar-btn.danger:hover {
-            background: rgba(239,68,68,0.15);
-            color: #f87171;
-            border-color: rgba(239,68,68,0.2);
-        }
-
-        /* ===== CHAT AREA ===== */
-        .chat-area {
-            flex: 1;
+        #messages {
+            height: 400px;
             overflow-y: auto;
-            padding: 16px 32px 16px;
-        }
-
-        /* ===== MESSAGES ===== */
-        .message {
-            display: flex;
-            gap: 14px;
-            margin-bottom: 20px;
-            animation: slideUp 0.3s ease;
-        }
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(12px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .message-avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-            flex-shrink: 0;
-            margin-top: 2px;
-            box-shadow: 0 0 20px rgba(0,0,0,0.3);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-        .message-avatar:hover {
-            transform: scale(1.1);
-        }
-        
-        .message-avatar.user {
-            background: linear-gradient(135deg, #7c3aed, #8b5cf6);
-            color: #fff;
-            box-shadow: 0 0 25px rgba(124, 58, 237, 0.3);
-            border: 2px solid rgba(124, 58, 237, 0.2);
-        }
-        .message-avatar.user:hover {
-            box-shadow: 0 0 35px rgba(124, 58, 237, 0.5);
-        }
-        
-        .message-avatar.ai {
-            background: linear-gradient(135deg, #10b981, #14b8a6);
-            color: #fff;
-            box-shadow: 0 0 25px rgba(16, 185, 129, 0.3);
-            border: 2px solid rgba(16, 185, 129, 0.2);
-            animation: pulse-avatar 3s ease-in-out infinite;
-        }
-        .message-avatar.ai:hover {
-            box-shadow: 0 0 35px rgba(16, 185, 129, 0.5);
-        }
-
-        @keyframes pulse-avatar {
-            0%, 100% { box-shadow: 0 0 25px rgba(16, 185, 129, 0.3); }
-            50% { box-shadow: 0 0 40px rgba(16, 185, 129, 0.6); }
-        }
-
-        .message-content {
-            flex: 1;
-            max-width: 80%;
-        }
-        .message-content .sender {
-            font-size: 12px;
-            font-weight: 600;
-            color: rgba(255,255,255,0.3);
-            margin-bottom: 2px;
-        }
-        .message-content .bubble {
-            padding: 14px 18px;
-            border-radius: 12px;
-            font-size: 14px;
-            line-height: 1.7;
-            word-wrap: break-word;
-        }
-        .message.user .bubble {
-            background: rgba(124, 58, 237, 0.12);
-            border: 1px solid rgba(124, 58, 237, 0.08);
-            color: rgba(255,255,255,0.85);
-        }
-        .message.ai .bubble {
-            background: rgba(255,255,255,0.03);
-            border: 1px solid rgba(255,255,255,0.05);
-            color: rgba(255,255,255,0.7);
-        }
-
-        .message-source {
-            display: inline-block;
-            font-size: 10px;
-            padding: 2px 10px;
-            border-radius: 10px;
-            background: rgba(255,255,255,0.04);
-            color: rgba(255,255,255,0.2);
-            margin-top: 6px;
-            letter-spacing: 0.3px;
-        }
-        .message-source.memory {
-            background: rgba(16,185,129,0.08);
-            color: #34d399;
-        }
-        .message-source.graph {
-            background: rgba(124,58,237,0.08);
-            color: #a78bfa;
-        }
-
-        .message.ai .bubble code {
-            background: rgba(255,255,255,0.05);
-            padding: 1px 6px;
-            border-radius: 4px;
-            font-family: 'Courier New', monospace;
-            font-size: 13px;
-            color: #34d399;
-        }
-        .message.ai .bubble pre {
-            background: rgba(0,0,0,0.3);
-            padding: 12px 16px;
-            border-radius: 8px;
-            overflow-x: auto;
-            margin: 8px 0;
-            border: 1px solid rgba(255,255,255,0.04);
-        }
-        .message.ai .bubble pre code {
-            background: none;
-            padding: 0;
-            color: #e2e8f0;
-        }
-
-        /* ===== WELCOME MESSAGE ===== */
-        .welcome-message {
-            text-align: center;
-            padding: 40px 20px;
-        }
-        .welcome-message .icon {
-            font-size: 48px;
-            color: #10b981;
             margin-bottom: 16px;
-            display: block;
+            padding: 10px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 8px;
         }
-        .welcome-message h2 {
-            font-size: 22px;
-            font-weight: 700;
-            margin-bottom: 8px;
+        .msg-user {
+            color: #6ee7b7;
+            text-align: right;
+            margin: 8px 0;
         }
-        .welcome-message p {
-            color: rgba(255,255,255,0.35);
-            max-width: 500px;
-            margin: 0 auto 20px;
-            font-size: 15px;
+        .msg-bot {
+            color: #60a5fa;
+            margin: 8px 0;
         }
-
-        /* ===== SUGGESTION CHIPS ===== */
-        .suggestions {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            justify-content: center;
-            margin-top: 12px;
-        }
-        .suggestion-chip {
-            background: rgba(255,255,255,0.04);
-            border: 1px solid rgba(255,255,255,0.06);
-            padding: 8px 18px;
-            border-radius: 20px;
-            font-size: 13px;
-            color: rgba(255,255,255,0.4);
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        .suggestion-chip:hover {
-            background: rgba(16,185,129,0.08);
-            border-color: rgba(16,185,129,0.15);
-            color: #34d399;
-            transform: translateY(-2px);
-        }
-
-        /* ===== TYPING INDICATOR ===== */
-        .typing-indicator {
-            display: none;
-            align-items: center;
-            gap: 14px;
-            margin-bottom: 20px;
-            padding: 8px 0;
-        }
-        .typing-indicator.show {
-            display: flex;
-        }
-        .typing-indicator .dots {
-            display: flex;
-            gap: 4px;
-            padding: 12px 18px;
-            background: rgba(255,255,255,0.03);
-            border: 1px solid rgba(255,255,255,0.05);
-            border-radius: 12px;
-        }
-        .typing-indicator .dot {
-            width: 8px;
-            height: 8px;
-            background: rgba(255,255,255,0.2);
-            border-radius: 50%;
-            animation: typingBounce 1.4s ease-in-out infinite;
-        }
-        .typing-indicator .dot:nth-child(2) { animation-delay: 0.2s; }
-        .typing-indicator .dot:nth-child(3) { animation-delay: 0.4s; }
-        @keyframes typingBounce {
-            0%, 60%, 100% { transform: translateY(0); opacity: 0.3; }
-            30% { transform: translateY(-8px); opacity: 1; }
-        }
-
-        /* ===== INPUT AREA ===== */
         .input-area {
-            padding: 16px 32px 24px;
-            border-top: 1px solid rgba(255,255,255,0.04);
-            flex-shrink: 0;
-            background: rgba(6, 6, 18, 0.8);
-            backdrop-filter: blur(10px);
-        }
-        .input-container {
             display: flex;
-            gap: 12px;
-            max-width: 900px;
-            margin: 0 auto;
+            gap: 10px;
         }
-        .input-container input {
+        .input-area input {
             flex: 1;
-            padding: 14px 20px;
-            border-radius: 12px;
-            background: rgba(255,255,255,0.04);
-            border: 1px solid rgba(255,255,255,0.06);
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.2);
+            background: rgba(255,255,255,0.05);
             color: #fff;
-            font-size: 14px;
-            outline: none;
-            transition: border-color 0.2s;
-            font-family: inherit;
         }
-        .input-container input:focus {
-            border-color: rgba(16,185,129,0.3);
-        }
-        .input-container input::placeholder {
-            color: rgba(255,255,255,0.2);
-        }
-        .input-container button {
-            padding: 14px 32px;
-            border-radius: 12px;
+        .input-area button {
+            padding: 10px 20px;
+            border-radius: 8px;
             border: none;
             background: linear-gradient(135deg, #10b981, #3b82f6);
             color: #fff;
-            font-size: 14px;
-            font-weight: 600;
             cursor: pointer;
-            transition: all 0.2s;
-            white-space: nowrap;
+            font-weight: bold;
         }
-        .input-container button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 24px rgba(16,185,129,0.25);
+        .input-area button:hover {
+            opacity: 0.8;
         }
-        .input-container button:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none;
+        .typing {
+            color: rgba(255,255,255,0.3);
+            font-style: italic;
         }
-
-        @media (max-width: 768px) {
-            .sidebar { width: 60px; padding: 16px 8px; }
-            .sidebar .sb-logo-text, .sidebar .sb-logo-sub, 
-            .sidebar .sb-section, .sidebar .sb-item span,
-            .sidebar .sb-badge, .sidebar .sb-footer-label,
-            .sidebar .sb-footer-val { display: none; }
-            .sidebar .sb-item { justify-content: center; padding: 10px; }
-            .sidebar .sb-item i { font-size: 20px; width: auto; }
-            .sidebar .sb-item.active::before { left: -8px; }
-            .main { margin-left: 60px; }
-            .topbar { padding: 12px 16px; flex-wrap: wrap; gap: 8px; }
-            .topbar-left h1 { font-size: 17px; }
-            .chat-area { padding: 16px; }
-            .input-area { padding: 12px 16px 16px; }
-            .message-content { max-width: 90%; }
-            .suggestions { flex-direction: column; align-items: center; }
-            .input-container { flex-direction: column; }
-            .input-container button { width: 100%; }
-            .back-btn { margin: 12px 16px 4px 16px; font-size: 12px; padding: 4px 10px; }
+        a {
+            color: rgba(255,255,255,0.4);
+            text-decoration: none;
+        }
+        a:hover {
+            color: rgba(255,255,255,0.8);
         }
     </style>
 </head>
 <body>
-
-    <!-- ===== SIDEBAR ===== -->
-    <div class="sidebar">
-        <div class="sb-logo">
-            <div class="sb-logo-icon"></div>
-            <div>
-                <div class="sb-logo-text">CogneeCode</div>
-                <div class="sb-logo-sub">Developer Memory</div>
-            </div>
+    <div class="chat-box">
+        <h2 style="text-align:center;">🧠 CogneeCode</h2>
+        <div style="text-align:center;margin-bottom:12px;">
+            <a href="/dashboard">← Dashboard</a>
         </div>
-
-        <div class="sb-section">Main</div>
-        <a href="/dashboard" class="sb-item">
-            <i class="ti ti-layout-dashboard"></i> <span>Dashboard</span>
-        </a>
-        <a href="/ask" class="sb-item active">
-            <i class="ti ti-message-circle"></i> <span>Ask Codebase</span>
-            <span class="sb-badge">AI</span>
-        </a>
-        <a href="/search" class="sb-item">
-            <i class="ti ti-search"></i> <span>Search Memory</span>
-        </a>
-
-        <div class="sb-section">Remember</div>
-        <a href="/decisions" class="sb-item">
-            <i class="ti ti-bulb"></i> <span>Decisions</span>
-        </a>
-        <a href="/bugs" class="sb-item">
-            <i class="ti ti-bug"></i> <span>Bug Fixes</span>
-        </a>
-
-        <div class="sb-section">Visualize</div>
-        <a href="/graph-view" class="sb-item">
-            <i class="ti ti-clock"></i> <span>Timeline</span>
-        </a>
-        <a href="/analytics" class="sb-item">
-            <i class="ti ti-chart-bar"></i> <span>Analytics</span>
-        </a>
-
-        <div class="sb-section">Manage</div>
-        <a href="/forget" class="sb-item">
-            <i class="ti ti-trash"></i> <span>Forget</span>
-        </a>
-
-        <div class="sb-footer">
-            <div class="sb-footer-label">Memories stored</div>
-            <div class="sb-footer-val" id="memCount">Loading...</div>
-            <div class="sb-mem-bar">
-                <div class="sb-mem-fill" id="memBar"></div>
-            </div>
+        <div id="messages">
+            <div class="msg-bot">🤖 Hello! Ask me anything about your codebase.</div>
         </div>
-    </div>
-
-    <!-- ===== MAIN CONTENT ===== -->
-    <div class="main">
-
-        <!-- ===== BACK BUTTON ===== -->
-        <a href="/" class="back-btn">
-            <i class="ti ti-arrow-left"></i> Back to Landing
-        </a>
-
-        <!-- ===== TOPBAR ===== -->
-        <div class="topbar">
-            <div class="topbar-left">
-                <h1>Ask Your Codebase</h1>
-                <p>Natural language developer memory</p>
-            </div>
-            <div class="topbar-right">
-                <button class="topbar-btn danger" onclick="clearChat()">
-                    <i class="ti ti-trash"></i> Clear chat
-                </button>
-            </div>
-        </div>
-
-        <!-- ===== CHAT AREA ===== -->
-        <div class="chat-area" id="chatArea">
-            <!-- Welcome Message -->
-            <div class="welcome-message" id="welcomeMessage">
-                <span class="icon">🤖</span>
-                <h2>Hello! I'm CogneeCode</h2>
-                <p>
-                    I remember everything about your codebase. Ask me about past decisions, bug fixes, 
-                    code context, or anything you've told me to remember.
-                </p>
-                <div class="suggestions">
-                    <span class="suggestion-chip" onclick="sendSuggestion('Why did we choose this architecture?')">
-                        🏗️ Why did we choose this architecture?
-                    </span>
-                    <span class="suggestion-chip" onclick="sendSuggestion('How did I fix that authentication bug?')">
-                        🔐 How did I fix that authentication bug?
-                    </span>
-                    <span class="suggestion-chip" onclick="sendSuggestion('What was decided about the database schema?')">
-                        🗄️ What was decided about the database schema?
-                    </span>
-                    <span class="suggestion-chip" onclick="sendSuggestion('Show me similar bugs to this error')">
-                        🐛 Show me similar bugs to this error
-                    </span>
-                </div>
-            </div>
-
-            <!-- Messages Container -->
-            <div id="messagesContainer"></div>
-
-            <!-- Typing Indicator -->
-            <div class="typing-indicator" id="typingIndicator">
-                <div class="message-avatar ai">🤖</div>
-                <div class="dots">
-                    <span class="dot"></span>
-                    <span class="dot"></span>
-                    <span class="dot"></span>
-                </div>
-            </div>
-        </div>
-
-        <!-- ===== INPUT AREA ===== -->
         <div class="input-area">
-            <div class="input-container">
-                <input 
-                    id="chatInput" 
-                    type="text" 
-                    placeholder="Ask anything about your codebase..." 
-                    onkeypress="if(event.key==='Enter') sendMessage()"
-                />
-                <button id="sendBtn" onclick="sendMessage()">
-                    <i class="ti ti-send"></i> Send
-                </button>
-            </div>
+            <input type="text" id="userInput" placeholder="Type your message..." autofocus>
+            <button onclick="sendMessage()">Send</button>
         </div>
-
     </div>
 
-    <!-- ===== SCRIPTS ===== -->
     <script>
-        // ===== SIDEBAR STATS =====
-        async function loadSidebarStats() {
-            try {
-                const res = await fetch('/api/stats');
-                const data = await res.json();
-                const el = document.getElementById('memCount');
-                const bar = document.getElementById('memBar');
-                if (el) el.textContent = (data.memories || 0) + ' memories';
-                if (bar) bar.style.width = Math.min((data.memories || 0), 100) + '%';
-            } catch(e) {
-                const el = document.getElementById('memCount');
-                if (el) el.textContent = '0 memories';
-            }
-        }
-        loadSidebarStats();
-
-        // ===== CHAT VARIABLES =====
-        const messagesContainer = document.getElementById('messagesContainer');
-        const welcomeMessage = document.getElementById('welcomeMessage');
-        const typingIndicator = document.getElementById('typingIndicator');
-        const chatInput = document.getElementById('chatInput');
-        const sendBtn = document.getElementById('sendBtn');
-
-        let isTyping = false;
-        let messageCount = 0;
-
-        // ===== SAVE & LOAD CHAT HISTORY =====
-        function saveChatHistory() {
-            const messages = [];
-            document.querySelectorAll('.message').forEach(msg => {
-                const isUser = msg.classList.contains('user');
-                const bubble = msg.querySelector('.bubble');
-                const text = bubble ? bubble.textContent : '';
-                const sourceEl = msg.querySelector('.message-source');
-                const source = sourceEl ? sourceEl.textContent : null;
-                messages.push({ text, isUser, source });
-            });
-            localStorage.setItem('cc_chat_history', JSON.stringify(messages));
-            localStorage.setItem('cc_chat_count', messageCount);
-        }
-
-        function loadChatHistory() {
-            const saved = localStorage.getItem('cc_chat_history');
-            const count = parseInt(localStorage.getItem('cc_chat_count')) || 0;
-            
-            if (saved && count > 0) {
-                const messages = JSON.parse(saved);
-                messageCount = count;
-                welcomeMessage.style.display = 'none';
-                
-                messages.forEach(msg => {
-                    const div = document.createElement('div');
-                    div.className = `message ${msg.isUser ? 'user' : 'ai'}`;
-
-                    const avatar = document.createElement('div');
-                    avatar.className = `message-avatar ${msg.isUser ? 'user' : 'ai'}`;
-                    avatar.textContent = msg.isUser ? '👨‍💻' : '🤖';
-
-                    const content = document.createElement('div');
-                    content.className = 'message-content';
-
-                    const sender = document.createElement('div');
-                    sender.className = 'sender';
-                    sender.textContent = msg.isUser ? 'You' : 'CogneeCode';
-
-                    const bubble = document.createElement('div');
-                    bubble.className = 'bubble';
-                    bubble.textContent = msg.text;
-
-                    content.appendChild(sender);
-                    content.appendChild(bubble);
-
-                    if (msg.source) {
-                        const src = document.createElement('div');
-                        src.className = `message-source ${msg.source.includes('memory') ? 'memory' : 'graph'}`;
-                        src.textContent = msg.source;
-                        content.appendChild(src);
-                    }
-
-                    div.appendChild(avatar);
-                    div.appendChild(content);
-                    messagesContainer.appendChild(div);
-                });
-                
-                scrollToBottom();
-                return true;
-            }
-            return false;
-        }
-
-        function clearChatHistory() {
-            localStorage.removeItem('cc_chat_history');
-            localStorage.removeItem('cc_chat_count');
-        }
-
-        // ===== ADD MESSAGE =====
-        function addMessage(text, isUser, source = null) {
-            if (messageCount === 0) {
-                welcomeMessage.style.display = 'none';
-            }
-            messageCount++;
-
-            const div = document.createElement('div');
-            div.className = `message ${isUser ? 'user' : 'ai'}`;
-
-            const avatar = document.createElement('div');
-            avatar.className = `message-avatar ${isUser ? 'user' : 'ai'}`;
-            avatar.textContent = isUser ? '👨‍💻' : '🤖';
-
-            const content = document.createElement('div');
-            content.className = 'message-content';
-
-            const sender = document.createElement('div');
-            sender.className = 'sender';
-            sender.textContent = isUser ? 'You' : 'CogneeCode';
-
-            const bubble = document.createElement('div');
-            bubble.className = 'bubble';
-            
-            if (!isUser && text) {
-                let formattedText = text;
-                const codeBlockRegex = /```(\w+)?\n([\s\S]*?)```/g;
-                formattedText = formattedText.replace(codeBlockRegex, (match, lang, code) => {
-                    return `<pre><code>${code.trim()}</code></pre>`;
-                });
-                formattedText = formattedText.replace(/`([^`]+)`/g, '<code>$1</code>');
-                bubble.innerHTML = formattedText;
-            } else {
-                bubble.textContent = text;
-            }
-
-            content.appendChild(sender);
-            content.appendChild(bubble);
-
-            if (source) {
-                const src = document.createElement('div');
-                src.className = `message-source ${source === 'memory' ? 'memory' : 'graph'}`;
-                src.textContent = source === 'memory' ? '🧠 from memory' : '📊 graph search';
-                content.appendChild(src);
-            }
-
-            div.appendChild(avatar);
-            div.appendChild(content);
-            messagesContainer.appendChild(div);
-            scrollToBottom();
-            
-            saveChatHistory();
-        }
-
-        function scrollToBottom() {
-            const chatArea = document.getElementById('chatArea');
-            setTimeout(() => {
-                chatArea.scrollTop = chatArea.scrollHeight;
-            }, 50);
-        }
-
-        function showTyping() {
-            typingIndicator.classList.add('show');
-            scrollToBottom();
-        }
-
-        function hideTyping() {
-            typingIndicator.classList.remove('show');
-        }
-
         async function sendMessage() {
-            const question = chatInput.value.trim();
-            if (!question || isTyping) return;
+            const input = document.getElementById('userInput');
+            const messages = document.getElementById('messages');
+            const msg = input.value.trim();
+            if (!msg) return;
 
-            chatInput.disabled = true;
-            sendBtn.disabled = true;
-            isTyping = true;
+            // Show user message
+            messages.innerHTML += `<div class="msg-user">👨‍💻 You: ${msg}</div>`;
+            input.value = '';
+            messages.scrollTop = messages.scrollHeight;
 
-            addMessage(question, true);
-            chatInput.value = '';
-            showTyping();
+            // Show typing indicator
+            const typingId = 'typing-' + Date.now();
+            messages.innerHTML += `<div class="typing" id="${typingId}">🤖 CogneeCode is thinking...</div>`;
+            messages.scrollTop = messages.scrollHeight;
 
             try {
-                const res = await fetch('/api/ask', {
+                const response = await fetch('/api/chat', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ question, language: 'English' })
+                    body: JSON.stringify({ message: msg, user_id: 'default' })
                 });
 
-                const data = await res.json();
-                hideTyping();
+                const data = await response.json();
+                document.getElementById(typingId)?.remove();
 
-                if (data.status === 'success') {
-                    const answer = data.answer || 'No answer found.';
-                    const source = data.source || 'memory';
-                    
-                    const div = document.createElement('div');
-                    div.className = 'message ai';
-
-                    const avatar = document.createElement('div');
-                    avatar.className = 'message-avatar ai';
-                    avatar.textContent = '🤖';
-
-                    const content = document.createElement('div');
-                    content.className = 'message-content';
-
-                    const sender = document.createElement('div');
-                    sender.className = 'sender';
-                    sender.textContent = 'CogneeCode';
-
-                    const bubble = document.createElement('div');
-                    bubble.className = 'bubble';
-
-                    const src = document.createElement('div');
-                    src.className = `message-source ${source === 'memory' ? 'memory' : 'graph'}`;
-                    src.textContent = source === 'memory' ? '🧠 from memory' : '📊 graph search';
-
-                    content.appendChild(sender);
-                    content.appendChild(bubble);
-                    content.appendChild(src);
-
-                    div.appendChild(avatar);
-                    div.appendChild(content);
-                    messagesContainer.appendChild(div);
-
-                    let formattedText = answer;
-                    const codeBlockRegex = /```(\w+)?\n([\s\S]*?)```/g;
-                    formattedText = formattedText.replace(codeBlockRegex, (match, lang, code) => {
-                        return `<pre><code>${code.trim()}</code></pre>`;
-                    });
-                    formattedText = formattedText.replace(/`([^`]+)`/g, '<code>$1</code>');
-                    
-                    const parts = formattedText.split('\n');
-                    bubble.innerHTML = '';
-                    
-                    let currentIndex = 0;
-                    function typeNextPart() {
-                        if (currentIndex < parts.length) {
-                            const part = parts[currentIndex];
-                            if (part.startsWith('<pre>')) {
-                                const tempDiv = document.createElement('div');
-                                tempDiv.innerHTML = part;
-                                bubble.appendChild(tempDiv.firstElementChild);
-                                currentIndex++;
-                                setTimeout(typeNextPart, 50);
-                            } else if (part.trim() === '') {
-                                bubble.appendChild(document.createElement('br'));
-                                currentIndex++;
-                                setTimeout(typeNextPart, 50);
-                            } else {
-                                const textNode = document.createTextNode('');
-                                bubble.appendChild(textNode);
-                                let charIndex = 0;
-                                function typeChar() {
-                                    if (charIndex < part.length) {
-                                        const char = part.charAt(charIndex);
-                                        textNode.textContent += char;
-                                        charIndex++;
-                                        scrollToBottom();
-                                        setTimeout(typeChar, 15);
-                                    } else {
-                                        currentIndex++;
-                                        setTimeout(typeNextPart, 50);
-                                    }
-                                }
-                                typeChar();
-                            }
-                        } else {
-                            hideTyping();
-                            scrollToBottom();
-                            chatInput.disabled = false;
-                            sendBtn.disabled = false;
-                            isTyping = false;
-                            chatInput.focus();
-                            saveChatHistory();
-                        }
-                    }
-                    typeNextPart();
-
-                } else {
-                    addMessage('❌ Error: ' + data.message, false);
-                    chatInput.disabled = false;
-                    sendBtn.disabled = false;
-                    isTyping = false;
-                }
-            } catch (e) {
-                hideTyping();
-                addMessage('❌ Error: Could not get response. Please try again.', false);
-                chatInput.disabled = false;
-                sendBtn.disabled = false;
-                isTyping = false;
+                const reply = data.response || data.answer || 'Sorry, I did not understand.';
+                messages.innerHTML += `<div class="msg-bot">🤖 CogneeCode: ${reply}</div>`;
+                messages.scrollTop = messages.scrollHeight;
+            } catch (error) {
+                document.getElementById(typingId)?.remove();
+                messages.innerHTML += `<div class="msg-bot">❌ Error connecting to server. Make sure the app is running.</div>`;
             }
         }
 
-        function sendSuggestion(text) {
-            chatInput.value = text;
-            sendMessage();
-        }
-
-        function clearChat() {
-            if (messageCount === 0) return;
-            if (confirm('Clear all messages?')) {
-                messagesContainer.innerHTML = '';
-                messageCount = 0;
-                welcomeMessage.style.display = 'block';
-                chatInput.focus();
-                clearChatHistory();
-            }
-        }
-
-        document.addEventListener('DOMContentLoaded', () => {
-            const hasHistory = loadChatHistory();
-            if (!hasHistory) {
-                welcomeMessage.style.display = 'block';
-            }
-            chatInput.focus();
+        document.getElementById('userInput')?.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') sendMessage();
         });
     </script>
-
 </body>
 </html>

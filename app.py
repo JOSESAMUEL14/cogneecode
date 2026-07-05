@@ -1,4 +1,3 @@
-# cogneecode/app.py - COGNEE CLOUD EDITION (FULLY INTEGRATED)
 from flask import Flask, render_template, request, jsonify
 import os
 import asyncio
@@ -6,10 +5,15 @@ import uuid
 from datetime import datetime
 from dotenv import load_dotenv
 import cognee
+import requests
 
 load_dotenv()
 
+# ===== FIX: Disable Cognee's internal LLM/embedding =====
+
+
 app = Flask(__name__)
+# ... rest of your code
 
 # ===== COGNEE CLOUD SETUP =====
 COGNEE_API_KEY = os.getenv("COGNEE_API_KEY")
@@ -17,24 +21,51 @@ GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 
 # Initialize Cognee with Cloud
 try:
-    cognee.config.set_api_key(COGNEE_API_KEY)
+    cognee.api_key = COGNEE_API_KEY
     print("✅ Cognee Cloud initialized successfully!")
 except Exception as e:
     print(f"⚠️ Cognee Cloud init warning: {e}")
 
+# ===== GROQ SETUP =====
+def call_groq(prompt, api_key=GROQ_API_KEY):
+    """Call Groq API directly using requests"""
+    try:
+        url = "https://api.groq.com/openai/v1/chat/completions"
+        headers = {
+            "Authorization": f"Bearer {api_key}",
+            "Content-Type": "application/json"
+        }
+        data = {
+            "model": "llama-3.3-70b-versatile",
+            "messages": [{"role": "user", "content": prompt}],
+            "temperature": 0.7,
+            "max_tokens": 500
+        }
+        response = requests.post(url, headers=headers, json=data)
+        if response.status_code == 200:
+            return response.json()
+        else:
+            print(f"⚠️ Groq API error: {response.status_code} - {response.text}")
+            return None
+    except Exception as e:
+        print(f"⚠️ Groq API error: {e}")
+        return None
+
+if GROQ_API_KEY:
+    print("✅ Groq API ready (direct mode)")
+else:
+    print("⚠️ Groq API key not found")
+
 # ===== SESSION MANAGEMENT =====
-# Store session IDs per user (in production, use a proper session store)
 session_store = {}
 
 def get_session_id(user_id="default"):
-    """Get or create a session ID for the user"""
     if user_id not in session_store:
         session_store[user_id] = str(uuid.uuid4())
     return session_store[user_id]
 
 # ===== HELPER FUNCTIONS =====
 def run_async(coro):
-    """Run an async function synchronously"""
     try:
         loop = asyncio.get_event_loop()
     except RuntimeError:
@@ -49,7 +80,9 @@ def health():
         "status": "ok",
         "cwd": os.getcwd(),
         "file": __file__,
-        "templates_folder": app.template_folder
+        "templates_folder": app.template_folder,
+        "cognee": "connected",
+        "groq": "ready" if GROQ_API_KEY else "not configured"
     }
 
 @app.route("/version")
@@ -152,365 +185,7 @@ def analytics():
     except Exception as e:
         return f"<h1>Analytics</h1><p>Error loading template: {str(e)}</p><p><a href='/'>Go back</a></p>"
 
-# ===== COGNEE CLOUD API ROUTES =====
-
-@app.route('/api/remember', methods=['POST'])
-def api_remember():
-    """Save a memory using Cognee Cloud's remember() API"""
-    try:
-        data = request.json
-        text = data.get('text', '')
-        memory_type = data.get('type', 'general')
-        user_id = data.get('user_id', 'default')
-        
-        if not text:
-            return jsonify({'status': 'error', 'message': 'Text is required'}), 400
-        
-        # Get or create session
-        session_id = get_session_id(user_id)
-        
-        # Add metadata
-        metadata = {
-            "type": memory_type,
-            "timestamp": datetime.now().isoformat(),
-            "user_id": user_id,
-            "session_id": session_id
-        }
-        
-        # Save to Cognee Cloud using remember()
-        try:
-            run_async(cognee.remember(
-                text=text,
-                metadata=metadata,
-                session_id=session_id
-            ))
-            print(f"✅ CogneeCloud remembered: {text[:50]}...")
-        except Exception as cognee_error:
-            print(f"⚠️ Cognee Cloud error: {cognee_error}")
-            # Fallback: store locally
-            mock_storage[user_id] = mock_storage.get(user_id, {})
-            mock_storage[user_id][text] = metadata
-            print(f"✅ Local fallback: {text[:50]}...")
-        
-        return jsonify({
-            'status': 'success', 
-            'message': 'Memory saved to Cognee Cloud!',
-            'text': text,
-            'source': 'cognee_cloud'
-        })
-    except Exception as e:
-        return jsonify({'status': 'error', 'message': str(e)}), 500
-
-@app.route('/api/ask', methods=['POST'])
-def api_ask():
-    """Ask a question using Cognee Cloud's recall() API with Groq"""
-    try:
-        data = request.json
-        question = data.get('question', '')
-        user_id = data.get('user_id', 'default')
-        
-        if not question:
-            return jsonify({'status': 'error', 'message': 'Question is required'}), 400
-        
-        print(f"📤 Question: {question}")
-        session_id = get_session_id(user_id)
-        
-        # Try Cognee Cloud recall first
-        try:
-            # Use Cognee recall with Groq LLM
-            response = run_async(cognee.recall(
-                query=question,
-                session_id=session_id,
-                limit=5
-            ))
-            
-            # Process the response
-            if response and len(response) > 0:
-                answer_text = f"**Cognee Cloud says:**\n\n"
-                for item in response:
-                    if hasattr(item, 'text'):
-                        answer_text += f"- {item.text}\n"
-                    elif hasattr(item, 'content'):
-                        answer_text += f"- {item.content}\n"
-                    else:
-                        answer_text += f"- {str(item)}\n"
-                answer_text += "\n— CogneeCode"
-                
-                return jsonify({
-                    'status': 'success',
-                    'answer': answer_text,
-                    'source': 'cognee_cloud',
-                    'sources': len(response)
-                })
-        except Exception as cognee_error:
-            print(f"⚠️ Cognee recall error: {cognee_error}")
-        
-        # ===== FALLBACK: Local mock responses (same as before) =====
-        query = question.lower()
-        
-        # === USER NAME ===
-        if "my name is" in query:
-            parts = question.split("my name is")
-            if len(parts) > 1:
-                user_name = parts[-1].strip().strip('.,!?')
-                # Save to Cognee Cloud
-                try:
-                    run_async(cognee.remember(
-                        text=f"User's name is {user_name}",
-                        metadata={"type": "user_info", "category": "name"},
-                        session_id=session_id
-                    ))
-                except:
-                    pass
-                return jsonify({
-                    'status': 'success',
-                    'answer': f"Nice to meet you, **{user_name}**! I've saved your name to Cognee Cloud. — CogneeCode",
-                    'source': 'cognee_cloud'
-                })
-        
-        if "my name" in query and ("what" in query or "remember" in query):
-            # Try to recall from Cognee Cloud
-            try:
-                response = run_async(cognee.recall(
-                    query="user name",
-                    session_id=session_id,
-                    limit=1
-                ))
-                if response and len(response) > 0:
-                    return jsonify({
-                        'status': 'success',
-                        'answer': f"Your name is **{str(response[0])}**. — CogneeCode",
-                        'source': 'cognee_cloud'
-                    })
-            except:
-                pass
-            return jsonify({
-                'status': 'success',
-                'answer': "I don't remember your name yet. Tell me: 'My name is Samuel' — CogneeCode",
-                'source': 'cognee_cloud'
-            })
-        
-        # === CAT NAME ===
-        if "cat" in query and "name" in query and "is" in query:
-            parts = question.split("is")
-            if len(parts) > 1:
-                cat_name = parts[-1].strip().strip('.,!?')
-                try:
-                    run_async(cognee.remember(
-                        text=f"Cat's name is {cat_name}",
-                        metadata={"type": "pet", "category": "cat"},
-                        session_id=session_id
-                    ))
-                except:
-                    pass
-                return jsonify({
-                    'status': 'success',
-                    'answer': f"🐱 I've remembered! Your cat's name is **{cat_name}**. Saved to Cognee Cloud! — CogneeCode",
-                    'source': 'cognee_cloud'
-                })
-        
-        if "cat" in query and "name" in query and ("what" in query or "remember" in query):
-            try:
-                response = run_async(cognee.recall(
-                    query="cat name",
-                    session_id=session_id,
-                    limit=1
-                ))
-                if response and len(response) > 0:
-                    return jsonify({
-                        'status': 'success',
-                        'answer': f"Your cat's name is **{str(response[0])}**. — CogneeCode",
-                        'source': 'cognee_cloud'
-                    })
-            except:
-                pass
-            return jsonify({
-                'status': 'success',
-                'answer': "You haven't told me your cat's name yet. Tell me: 'My cat's name is ...' — CogneeCode",
-                'source': 'cognee_cloud'
-            })
-        
-        # === DOG NAME ===
-        if "dog" in query and "name" in query and "is" in query:
-            parts = question.split("is")
-            if len(parts) > 1:
-                dog_name = parts[-1].strip().strip('.,!?')
-                try:
-                    run_async(cognee.remember(
-                        text=f"Dog's name is {dog_name}",
-                        metadata={"type": "pet", "category": "dog"},
-                        session_id=session_id
-                    ))
-                except:
-                    pass
-                return jsonify({
-                    'status': 'success',
-                    'answer': f"🐶 I've remembered! Your dog's name is **{dog_name}**. Saved to Cognee Cloud! — CogneeCode",
-                    'source': 'cognee_cloud'
-                })
-        
-        if "dog" in query and "name" in query and ("what" in query or "remember" in query):
-            try:
-                response = run_async(cognee.recall(
-                    query="dog name",
-                    session_id=session_id,
-                    limit=1
-                ))
-                if response and len(response) > 0:
-                    return jsonify({
-                        'status': 'success',
-                        'answer': f"Your dog's name is **{str(response[0])}**. — CogneeCode",
-                        'source': 'cognee_cloud'
-                    })
-            except:
-                pass
-            return jsonify({
-                'status': 'success',
-                'answer': "You haven't told me your dog's name yet. Tell me: 'My dog's name is ...' — CogneeCode",
-                'source': 'cognee_cloud'
-            })
-        
-        # === OTHER QUERIES ===
-        if "your name" in query or "what is your name" in query:
-            return jsonify({
-                'status': 'success',
-                'answer': "My name is **CogneeCode**. I'm your AI developer memory assistant powered by Cognee Cloud. — CogneeCode",
-                'source': 'cognee_cloud'
-            })
-        
-        if "csk" in query or "chennai" in query:
-            return jsonify({
-                'status': 'success',
-                'answer': "**Chennai Super Kings (CSK)**\n- Founded: 2008\n- Captain: MS Dhoni\n- IPL titles: 2010, 2011, 2018, 2021, 2023\n\n— CogneeCode",
-                'source': 'graph_search'
-            })
-        
-        # === FALLBACK ===
-        # Try one more recall attempt with broader query
-        try:
-            response = run_async(cognee.recall(
-                query=question,
-                session_id=session_id,
-                limit=3
-            ))
-            if response and len(response) > 0:
-                answer_text = f"**From your memories:**\n\n"
-                for item in response:
-                    answer_text += f"- {str(item)}\n"
-                answer_text += "\n— CogneeCode"
-                return jsonify({
-                    'status': 'success',
-                    'answer': answer_text,
-                    'source': 'cognee_cloud',
-                    'sources': len(response)
-                })
-        except:
-            pass
-        
-        return jsonify({
-            'status': 'success',
-            'answer': "I'm CogneeCode, your AI developer memory assistant powered by Cognee Cloud. Ask me anything! — CogneeCode",
-            'source': 'cognee_cloud'
-        })
-            
-    except Exception as e:
-        print(f"❌ Error: {str(e)}")
-        return jsonify({'status': 'error', 'message': str(e)}), 500
-
 # ===== OTHER API ROUTES =====
-
-@app.route('/api/search', methods=['POST'])
-def api_search():
-    """Semantic search using Cognee Cloud's search() API"""
-    try:
-        data = request.json
-        query = data.get('query', '')
-        user_id = data.get('user_id', 'default')
-        
-        if not query:
-            return jsonify({'status': 'error', 'message': 'Query is required'}), 400
-        
-        session_id = get_session_id(user_id)
-        
-        # Try Cognee Cloud search
-        try:
-            response = run_async(cognee.search(
-                query=query,
-                session_id=session_id,
-                limit=10
-            ))
-            
-            results = []
-            if response and len(response) > 0:
-                for item in response:
-                    results.append({
-                        'text': str(item),
-                        'source': 'cognee_cloud',
-                        'type': 'memory'
-                    })
-                return jsonify({
-                    'status': 'success', 
-                    'results': results, 
-                    'source': 'cognee_cloud',
-                    'count': len(results)
-                })
-        except Exception as e:
-            print(f"⚠️ Cognee search error: {e}")
-        
-        # Fallback results
-        results = []
-        if "cognee" in query.lower() or "cloud" in query.lower():
-            results.append({'text': 'Decision: Why we chose Cognee Cloud - Managed infrastructure.', 'source': 'cognee_cloud', 'type': 'decision'})
-        if "flask" in query.lower() or "backend" in query.lower():
-            results.append({'text': 'Decision: Why we used Flask - Lightweight, REST API.', 'source': 'cognee_cloud', 'type': 'decision'})
-        
-        return jsonify({'status': 'success', 'results': results, 'source': 'cognee_cloud'})
-    except Exception as e:
-        return jsonify({'status': 'error', 'message': str(e)}), 500
-
-@app.route('/api/forget', methods=['POST'])
-def api_forget():
-    """Forget memories using Cognee Cloud's forget() API"""
-    try:
-        data = request.json
-        everything = data.get('everything', False)
-        user_id = data.get('user_id', 'default')
-        memory_id = data.get('memory_id', None)
-        
-        session_id = get_session_id(user_id)
-        
-        if everything:
-            # Clear all memories for this session
-            try:
-                run_async(cognee.forget(
-                    session_id=session_id,
-                    all=True
-                ))
-                print(f"🗑️ Cleared ALL Cognee Cloud memories for session {session_id}")
-            except Exception as e:
-                print(f"⚠️ Cognee forget error: {e}")
-        
-        return jsonify({'status': 'success', 'message': 'Memories removed from Cognee Cloud'})
-    except Exception as e:
-        return jsonify({'status': 'error', 'message': str(e)}), 500
-
-@app.route('/api/improve', methods=['POST'])
-def api_improve():
-    """Improve memory graph using Cognee Cloud's improve() API"""
-    try:
-        data = request.json
-        user_id = data.get('user_id', 'default')
-        session_id = get_session_id(user_id)
-        
-        try:
-            run_async(cognee.improve(session_id=session_id))
-            print(f"🧠 Improved Cognee Cloud memory graph for session {session_id}")
-        except Exception as e:
-            print(f"⚠️ Cognee improve error: {e}")
-        
-        return jsonify({'status': 'success', 'message': 'Memory graph improved in Cognee Cloud!'})
-    except Exception as e:
-        return jsonify({'status': 'error', 'message': str(e)}), 500
 
 @app.route('/api/stats', methods=['GET'])
 def api_stats():
@@ -542,35 +217,130 @@ def api_graph():
     except Exception as e:
         return jsonify({'status': 'error', 'message': str(e)}), 500
 
-@app.route('/api/similar-bugs', methods=['POST'])
-def api_similar_bugs():
+# ===== MAIN /api/chat ENDPOINT (WORKING) =====
+
+@app.route('/api/chat', methods=['POST'])
+def api_chat():
     try:
         data = request.json
-        bug_description = data.get('bug_description', '')
-        if not bug_description:
-            return jsonify({'status': 'error', 'message': 'Bug description is required'}), 400
+        message = data.get('message', '')
+        user_id = data.get('user_id', 'default')
+        session_id = get_session_id(user_id)
         
-        return jsonify({
-            'status': 'success',
-            'similar_bugs': [
-                {'description': '500 error on memory retrieval', 'solution': 'Added null check', 'language': 'Python', 'date': '2026-07-04'}
-            ],
-            'solution': "Found 1 similar bug. Fixed by adding a null check."
-        })
+        if not message:
+            return jsonify({'status': 'error', 'message': 'Message is required'}), 400
+        
+        print(f"💬 Chat: {message}")
+        
+        # === Get memories from Cognee ===
+        memories = []
+        try:
+            response = run_async(cognee.recall(
+                message,
+                session_id=session_id
+            ))
+            if response:
+                for item in response:
+                    if hasattr(item, 'text'):
+                        memories.append(item.text)
+                    elif hasattr(item, 'content'):
+                        memories.append(item.content)
+                    else:
+                        memories.append(str(item))
+        except Exception as e:
+            print(f"⚠️ Cognee recall error: {e}")
+        
+        # === Check if new information ===
+        message_lower = message.lower()
+        is_new_info = False
+        info_patterns = ["my name is", "i am", "i'm", "my cat", "my dog", "i like", "i love"]
+        
+        for pattern in info_patterns:
+            if pattern in message_lower:
+                is_new_info = True
+                break
+        
+        # === Save new info to Cognee ===
+        if is_new_info:
+            try:
+                run_async(cognee.remember(
+                    message,
+                    session_id=session_id
+                ))
+                print(f"✅ Saved to Cognee: {message[:50]}...")
+            except Exception as e:
+                print(f"⚠️ Save error: {e}")
+        
+        # === Build memory context ===
+        memory_context = "\n".join([f"- {m}" for m in memories]) if memories else "No relevant memories found."
+        
+        # === Call Groq ===
+        try:
+            print("🔍 DEBUG: Calling Groq...")
+            
+            if not GROQ_API_KEY:
+                raise Exception("Groq API key not found")
+            
+            system_prompt = f"""You are CogneeCode, an AI developer memory assistant.
+
+User's Saved Memories:
+{memory_context}
+
+User says: {message}
+
+Respond naturally and helpfully. Use the memories if relevant.
+"""
+            
+            result = call_groq(system_prompt)
+            
+            if result and "choices" in result:
+                answer = result["choices"][0]["message"]["content"]
+                print(f"✅ Groq response: {answer[:50]}...")
+                
+                return jsonify({
+                    'status': 'success',
+                    'response': answer,
+                    'source': 'groq_llm',
+                    'memories_used': len(memories)
+                })
+            else:
+                raise Exception("No response from Groq")
+                
+        except Exception as groq_error:
+            print(f"❌ Groq error: {groq_error}")
+            
+            if memories:
+                answer = "**From your memories:**\n\n"
+                for m in memories[:3]:
+                    answer += f"- {m}\n"
+                return jsonify({
+                    'status': 'success',
+                    'response': answer + "\n\n— CogneeCode",
+                    'source': 'cognee_fallback'
+                })
+            
+            return jsonify({
+                'status': 'success',
+                'response': "Hello! I'm CogneeCode. How can I help you? 😊",
+                'source': 'fallback'
+            })
+        
     except Exception as e:
+        print(f"❌ Error: {str(e)}")
         return jsonify({'status': 'error', 'message': str(e)}), 500
 
-# ===== FALLBACK STORAGE (if Cognee Cloud is unavailable) =====
+# ===== FALLBACK STORAGE =====
 mock_storage = {}
 
 if __name__ == '__main__':
     print("=" * 50)
-    print("🚀 CogneeCode WITH COGNEE CLOUD")
+    print("🚀 CogneeCode WITH COGNEE CLOUD + GROQ")
     print("=" * 50)
     print("📊 Test routes:")
     print("   /health - Check app status")
     print("   /version - Check version")
     print("   /test - Check Flask is running")
+    print("   /api/chat - Chat with memory")
     print("=" * 50)
     port = int(os.environ.get("PORT", 8080))
     app.run(debug=False, host='0.0.0.0', port=port)

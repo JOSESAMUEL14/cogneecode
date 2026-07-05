@@ -1,5 +1,5 @@
 cognee
 flask
 python-dotenv
+requests
 fastembed
-groq
