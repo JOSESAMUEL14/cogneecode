@@ -4,26 +4,40 @@
 
 **Developer Memory Intelligence Platform**
 
+[![Live Demo](https://img.shields.io/badge/Live_Demo-View_App-10b981?style=for-the-badge&logo=render&logoColor=white)](https://josesamuel.pythonanywhere.com)
+[![GitHub](https://img.shields.io/badge/GitHub-Repository-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/JOSESAMUEL14/cogneecode)
+[![YouTube](https://img.shields.io/badge/Demo_Video-Watch-FF0000?style=for-the-badge&logo=youtube&logoColor=white)](https://youtu.be/TNcBIBuPW7c?si=D76Lhr6unDNzncpU)
+
 ---
 
-## 🌐 Live Demo
+## 🚀 Quick Links
 
-**Cognee Cloud URL:** `http://tenant-cb09d8ab-4a90-4d06-b28a-289a39c206b7.aws.cognee.ai`
+| Link | URL |
+|------|-----|
+| **🌐 Live Demo** | **[https://josesamuel.pythonanywhere.com](https://josesamuel.pythonanywhere.com)** |
+| **🐙 GitHub** | [https://github.com/JOSESAMUEL14/cogneecode](https://github.com/JOSESAMUEL14/cogneecode) |
+| **📹 Demo Video** | [https://youtu.be/TNcBIBuPW7c](https://youtu.be/TNcBIBuPW7c?si=D76Lhr6unDNzncpU) |
+| **📝 Blog Post** | [https://dev.to/jose_samuel_14/building-cogneecode-ai-developer-memory-assistant-lo1](https://dev.to/jose_samuel_14/building-cogneecode-ai-developer-memory-assistant-lo1) |
 
-**GitHub Repository:** [https://github.com/JOSESAMUEL14/cogneecode](https://github.com/JOSESAMUEL14/cogneecode)
+---
+
+## 🎥 Demo Video
+
+[![CogneeCode Demo](https://img.youtube.com/vi/TNcBIBuPW7c/0.jpg)](https://youtu.be/TNcBIBuPW7c?si=D76Lhr6unDNzncpU)
 
 ---
 
 ## 🎯 The Problem We Solve
 
 Every developer faces these problems:
-1. "Why did I make this architectural decision 3 months ago?"
-2. "What was that bug fix I wrote last week?"
-3. "We discussed this approach in standup — what did we decide?"
-4. "I fixed this exact bug before — how did I solve it?"
-5. "What was the context behind this weird piece of code?"
 
-**CogneeCode solves this** by building a PERMANENT knowledge graph of your entire codebase history, decisions, bugs, and solutions using Cognee Cloud's memory layer.
+1. *"Why did I make this architectural decision 3 months ago?"*
+2. *"What was that bug fix I wrote last week?"*
+3. *"We discussed this approach in standup — what did we decide?"*
+4. *"I fixed this exact bug before — how did I solve it?"*
+5. *"What was the context behind this weird piece of code?"*
+
+**CogneeCode solves this** by building a PERMANENT knowledge graph of your entire codebase history, decisions, bugs, and solutions using **Cognee Cloud's** memory layer.
 
 ---
 
@@ -54,14 +68,13 @@ Every developer faces these problems:
 | Embeddings | Fastembed |
 | Frontend | Vanilla HTML + CSS + JS |
 | Icons | Tabler Icons |
-| Deployment | Cognee Cloud Tenant |
+| Deployment | PythonAnywhere |
 
 ---
 
 ## 📦 Installation
 
 ### 1. Clone the Repository
-
 ```bash
 git clone https://github.com/JOSESAMUEL14/cogneecode.git
 cd cogneecode
