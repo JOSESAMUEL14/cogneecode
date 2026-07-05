@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head><title>Test Chat</title></head>
+<body>
+    <h1>Test Chat</h1>
+    <input type="text" id="msg" placeholder="Type message">
+    <button onclick="send()">Send</button>
+    <div id="result"></div>
+    <script>
+        async function send() {
+            const msg = document.getElementById('msg').value;
+            document.getElementById('result').innerHTML = 'Sending...';
+            try {
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: msg, user_id: 'test' })
+                });
+                const data = await response.json();
+                document.getElementById('result').innerHTML = 'Response: ' + (data.response || data.answer);
+            } catch (error) {
+                document.getElementById('result').innerHTML = 'Error: ' + error.message;
+            }
+        }
+    </script>
+</body>
+</html>

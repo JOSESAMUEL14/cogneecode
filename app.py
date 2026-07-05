@@ -9,11 +9,7 @@ import requests
 
 load_dotenv()
 
-# ===== FIX: Disable Cognee's internal LLM/embedding =====
-
-
 app = Flask(__name__)
-# ... rest of your code
 
 # ===== COGNEE CLOUD SETUP =====
 COGNEE_API_KEY = os.getenv("COGNEE_API_KEY")
@@ -26,7 +22,7 @@ try:
 except Exception as e:
     print(f"⚠️ Cognee Cloud init warning: {e}")
 
-# ===== GROQ SETUP =====
+# ===== GROQ SETUP - Using direct API =====
 def call_groq(prompt, api_key=GROQ_API_KEY):
     """Call Groq API directly using requests"""
     try:
@@ -217,7 +213,15 @@ def api_graph():
     except Exception as e:
         return jsonify({'status': 'error', 'message': str(e)}), 500
 
-# ===== MAIN /api/chat ENDPOINT (WORKING) =====
+# ===== TEST CHAT ROUTE =====
+@app.route('/test-chat')
+def test_chat():
+    try:
+        return render_template('test.html')
+    except Exception as e:
+        return f"<h1>Test Chat</h1><p>Error: {str(e)}</p>"
+
+# ===== MAIN /api/chat ENDPOINT =====
 
 @app.route('/api/chat', methods=['POST'])
 def api_chat():
@@ -341,6 +345,7 @@ if __name__ == '__main__':
     print("   /version - Check version")
     print("   /test - Check Flask is running")
     print("   /api/chat - Chat with memory")
+    print("   /test-chat - Simple chat test page")
     print("=" * 50)
     port = int(os.environ.get("PORT", 8080))
     app.run(debug=False, host='0.0.0.0', port=port)
