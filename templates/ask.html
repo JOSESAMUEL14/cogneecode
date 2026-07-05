@@ -108,6 +108,7 @@
             messages.scrollTop = messages.scrollHeight;
 
             try {
+                // ✅ USING THE CORRECT /api/chat ENDPOINT
                 const response = await fetch('/api/chat', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
